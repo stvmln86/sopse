@@ -1,4 +1,4 @@
-package resp
+package prot
 
 import (
 	"net/http"
@@ -8,6 +8,16 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stvmln86/sopse/sopse/tools/test"
 )
+
+func TestRead(t *testing.T) {
+	// setup
+	r := test.NewRequest("GET", "/", "body")
+
+	// success
+	body, err := Read(r)
+	assert.Equal(t, "body", body)
+	assert.NoError(t, err)
+}
 
 func TestWrite(t *testing.T) {
 	// setup
