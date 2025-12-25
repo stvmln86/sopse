@@ -2,7 +2,9 @@
 package test
 
 import (
+	"bytes"
 	"io"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 )
@@ -16,4 +18,10 @@ func GetResponse(t *testing.T, w *httptest.ResponseRecorder) (int, string) {
 	}
 
 	return rslt.StatusCode, string(bytes)
+}
+
+// NewRequest returns a new Request.
+func NewRequest(meth, path, body string) *http.Request {
+	buff := bytes.NewBufferString(body)
+	return httptest.NewRequest(meth, path, buff)
 }
