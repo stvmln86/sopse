@@ -36,6 +36,14 @@ Name        | Description                           | Default
 `-rateUser` | Maximum number of keys per user.      | `256`
 `-rateHits` | Maximum number of user hits per hour. | `100`
 
+## Endpoints
+
+Sopse's endpoints all send and receive UTF-8 plaintext, served over HTTP.
+
+### `GET /`
+
+Return a plaintext home page describing the endpoints and current server status.
+
 [ch]: https://github.com/stvmln86/sopse/blob/main/changes.md
 [li]: https://github.com/stvmln86/sopse/blob/main/license.md
 [re]: https://github.com/stvmln86/sopse/releases/latest
