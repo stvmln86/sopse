@@ -44,6 +44,11 @@ Sopse's endpoints all send and receive UTF-8 plaintext, served over HTTP.
 
 Return a plaintext home page describing the endpoints and current server status.
 
+## Contributing
+
+Please submit all bug reports and feature requests to the [issue tracker][is], thank you.
+
 [ch]: https://github.com/stvmln86/sopse/blob/main/changes.md
+[is]: https://github.com/stvmln86/sopse/issues
 [li]: https://github.com/stvmln86/sopse/blob/main/license.md
 [re]: https://github.com/stvmln86/sopse/releases/latest
