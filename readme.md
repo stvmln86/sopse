@@ -24,7 +24,6 @@ Sopse is configured entirely through command-line flags.
 Name    | Description                 | Default 
 ------- | --------------------------- | -------
 `-addr` | The address to serve on.    | `"127.0.0.1:8000"`
-`-logs` | The logging stream or file. | `""` (stdout)
 `-path` | The database file path.     | `"./sopse.db"`
 
 ### Rate Limiting Flags
