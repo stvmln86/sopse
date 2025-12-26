@@ -1,4 +1,4 @@
-package conf
+package flag
 
 import (
 	"testing"
@@ -19,10 +19,14 @@ func TestParse(t *testing.T) {
 
 	// success
 	Parse(elems)
-	assert.Equal(t, *FlagAddr, ":1234")
-	assert.Equal(t, *FlagPath, "test.db")
-	assert.Equal(t, *FlagRateBody, 1111)
-	assert.Equal(t, *FlagRateHits, 2222)
-	assert.Equal(t, *FlagRateName, 3333)
-	assert.Equal(t, *FlagRateUser, 4444)
+
+	// confirm - system flags
+	assert.Equal(t, *Addr, ":1234")
+	assert.Equal(t, *Path, "test.db")
+
+	// confirm - rate limiting flags
+	assert.Equal(t, *RateBody, 1111)
+	assert.Equal(t, *RateHits, 2222)
+	assert.Equal(t, *RateName, 3333)
+	assert.Equal(t, *RateUser, 4444)
 }
