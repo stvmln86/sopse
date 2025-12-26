@@ -23,7 +23,6 @@ Name    | Description                 | Default
 ------- | --------------------------- | -------
 `-addr` | The address to serve on.    | `"127.0.0.1:8000"`
 `-dbug` | Enable debugging mode.      | `false`
-`-path` | The database file path.     | `"./sopse.db"`
 
 ## Contributing
 
