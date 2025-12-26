@@ -1,4 +1,4 @@
-// Package asrt implements unit testing assertion functions.
+// Package asrt implements unit testing assertion and retrieval functions.
 package asrt
 
 import (
@@ -6,8 +6,19 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 )
+
+// Get returns the first value from a database query.
+func Get(t *testing.T, db *sqlx.DB, code string, elems ...any) any {
+	var data any
+	if err := db.Get(&data, code, elems...); err != nil {
+		t.Fatal(t)
+	}
+
+	return data
+}
 
 // Response asserts the status code and body from a ResponseRecorder.
 func Response(t *testing.T, w *httptest.ResponseRecorder, code int, body string) {
