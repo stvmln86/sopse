@@ -18,22 +18,22 @@ func Read(r *http.Request) (string, error) {
 	return string(bytes), nil
 }
 
-// Write writes a formatted text/plain string to a ResponseWriter.
-func Write(w http.ResponseWriter, code int, text string, elems ...any) {
+// Write writes a text/plain string to a ResponseWriter.
+func Write(w http.ResponseWriter, code int, text string) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(code)
-	fmt.Fprintf(w, text, elems...)
+	w.Write([]byte(text))
 }
 
 // WriteCode writes a text/plain error code to a ResponseWriter.
 func WriteCode(w http.ResponseWriter, code int) {
-	text := http.StatusText(code)
-	text = strings.ToLower(text)
-	Write(w, code, "error %d: %s", code, text)
+	stat := strings.ToLower(http.StatusText(code))
+	text := fmt.Sprintf("error %d: %s", code, stat)
+	Write(w, code, text)
 }
 
-// WriteError writes a formatted text/plain error string to a Response Writer.
-func WriteError(w http.ResponseWriter, code int, text string, elems ...any) {
-	text = fmt.Sprintf(text, elems...)
-	Write(w, code, "error %d: %s", code, text)
+// WriteError writes a text/plain error string to a ResponseWriter.
+func WriteError(w http.ResponseWriter, code int, text string) {
+	text = fmt.Sprintf("error %d: %s", code, text)
+	Write(w, code, text)
 }

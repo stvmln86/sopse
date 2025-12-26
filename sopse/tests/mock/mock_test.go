@@ -9,12 +9,12 @@ import (
 
 func TestRequest(t *testing.T) {
 	// success
-	requ := Request("GET", "/", "body")
-	assert.Equal(t, "GET", requ.Method)
-	assert.Equal(t, "/", requ.URL.Path)
+	r := Request("GET", "/", "body")
+	assert.Equal(t, "GET", r.Method)
+	assert.Equal(t, "/", r.URL.Path)
 
 	// confirm - body
-	bytes, err := io.ReadAll(requ.Body)
+	bytes, err := io.ReadAll(r.Body)
 	assert.Equal(t, "body", string(bytes))
 	assert.NoError(t, err)
 }

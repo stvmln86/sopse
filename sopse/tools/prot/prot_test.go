@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stvmln86/sopse/sopse/tools/test"
+	"github.com/stvmln86/sopse/sopse/tests/asrt"
+	"github.com/stvmln86/sopse/sopse/tests/mock"
 )
 
 func TestRead(t *testing.T) {
 	// setup
-	r := test.NewRequest("GET", "/", "body")
+	r := mock.Request("GET", "/", "body")
 
 	// success
 	body, err := Read(r)
@@ -24,10 +25,8 @@ func TestWrite(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	// success
-	Write(w, http.StatusOK, "%s", "body")
-	code, body := test.GetResponse(t, w)
-	assert.Equal(t, http.StatusOK, code)
-	assert.Equal(t, "body", body)
+	Write(w, http.StatusOK, "text")
+	asrt.Response(t, w, http.StatusOK, "text")
 
 	// confirm - header
 	data := w.Header().Get("Content-Type")
@@ -39,10 +38,8 @@ func TestWriteCode(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	// success
-	WriteCode(w, http.StatusInternalServerError)
-	code, body := test.GetResponse(t, w)
-	assert.Equal(t, http.StatusInternalServerError, code)
-	assert.Equal(t, "error 500: internal server error", body)
+	WriteCode(w, http.StatusBadRequest)
+	asrt.Response(t, w, http.StatusBadRequest, "error 400: bad request")
 }
 
 func TestWriteError(t *testing.T) {
@@ -50,8 +47,6 @@ func TestWriteError(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	// success
-	WriteError(w, http.StatusBadRequest, "%s", "body")
-	code, body := test.GetResponse(t, w)
-	assert.Equal(t, http.StatusBadRequest, code)
-	assert.Equal(t, "error 400: body", body)
+	WriteError(w, http.StatusBadRequest, "text")
+	asrt.Response(t, w, http.StatusBadRequest, "error 400: text")
 }
