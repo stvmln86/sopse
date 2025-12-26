@@ -8,9 +8,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
@@ -42,13 +45,54 @@ var (
 //////////////////////////////////
 
 // Pragma is the default always-enabled database pragma.
-const Pragma = ``
+const Pragma = `
+	pragma encoding = utf8;
+	pragma foreign_keys = true;
+`
 
 // Schema is the default first-run database schema.
-const Schema = ``
+const Schema = `
+	create table if not exists Users (
+		id   integer primary key asc,
+		uuid text    not null default (lower(hex(randomblob(16)))),
+		init integer not null default (unixepoch()),
+		addr text    not null,
+
+		unique(uuid)
+	);
+
+	create table if not exists Pairs (
+		id   integer primary key asc,
+		init integer not null default (unixepoch()),
+		user integer not null references Users(id),
+		name text    not null,
+		body text    not null,
+
+		unique(user, name)
+	);
+`
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//                         part two · http protocol functions                        //
+//                       part two · data sanitisation functions                      //
+///////////////////////////////////////////////////////////////////////////////////////
+
+// Addr returns the remote IP address from a Request.
+func Addr(r *http.Request) string {
+	host, _, _ := net.SplitHostPort(r.RemoteAddr)
+	return host
+}
+
+// Trim returns a string trimmed to a maximum size.
+func Trim(text string, size int) string {
+	if len(text) > size {
+		return text[:size]
+	}
+
+	return text
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+//                        part three · http protocol functions                       //
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // 2.1 · request functions
@@ -88,6 +132,18 @@ func WriteError(w http.ResponseWriter, code int, text string, elems ...any) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
+//                         part four · http handler functions                        //
+///////////////////////////////////////////////////////////////////////////////////////
+
+// 4.1 · GET handlers
+//////////////////////
+
+// GetIndex returns the index page.
+func GetIndex(w http.ResponseWriter, r *http.Request) {
+	Write(w, http.StatusOK, "hello")
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
 //  testing testing testing testing testing testing testing testing testing testing  //
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -99,4 +155,27 @@ func main() {
 	// Initialise database.
 	DB = sqlx.MustConnect("sqlite3", *FlagPath)
 	DB.MustExec(Pragma + Schema)
+
+	// Initialise multiplexer.
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /", GetIndex)
+
+	// Initialise server.
+	srv := &http.Server{
+		Addr:              *FlagAddr,
+		Handler:           mux,
+		ReadHeaderTimeout: 10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+	}
+
+	// Run server.
+	log.Printf("starting Sopse on %s", *FlagAddr)
+	if err := srv.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
+
+	// Close server.
+	if err := srv.Close(); err != nil {
+		log.Fatal(err)
+	}
 }
