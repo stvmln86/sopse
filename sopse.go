@@ -143,6 +143,42 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 	Write(w, http.StatusOK, "hello")
 }
 
+// 4.2 · POST handlers
+///////////////////////
+
+// PostRegister creates and returns a new user token.
+func PostRegister(w http.ResponseWriter, r *http.Request) {
+	code := "insert into Users (addr) values (?)"
+	if _, err := DB.Exec(code, Addr(r)); err != nil {
+		WriteCode(w, http.StatusInternalServerError)
+		return
+	}
+
+	var uuid string
+	code = "select uuid from Users where addr=? order by id desc limit 1"
+	if err := DB.Get(&uuid, code, Addr(r)); err != nil {
+		WriteCode(w, http.StatusInternalServerError)
+		return
+	}
+
+	Write(w, http.StatusCreated, "%s", uuid)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+//                          part five · middleware functions                         //
+///////////////////////////////////////////////////////////////////////////////////////
+
+// 5.1 · logging middleware
+////////////////////////////
+
+// LogWare logs HTTP requests with method, path, and duration.
+func LogWare(next http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r)
+		log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL.Path)
+	})
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //  testing testing testing testing testing testing testing testing testing testing  //
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -158,7 +194,8 @@ func main() {
 
 	// Initialise multiplexer.
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", GetIndex)
+	mux.Handle("GET /", LogWare(GetIndex))
+	mux.Handle("POST /new", LogWare(PostRegister))
 
 	// Initialise server.
 	srv := &http.Server{
