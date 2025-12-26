@@ -5,6 +5,7 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"io"
@@ -143,6 +144,38 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 	Write(w, http.StatusOK, "hello")
 }
 
+// GetPair returns a key-value pair.
+func GetPair(w http.ResponseWriter, r *http.Request) {
+	uuid := Trim(r.PathValue("uuid"), 32)
+	name := Trim(r.PathValue("name"), 32)
+
+	var user int64
+	code := "select id from Users where uuid=? limit 1"
+	err := DB.Get(&user, code, uuid)
+	switch {
+	case err == sql.ErrNoRows:
+		WriteCode(w, http.StatusNotFound)
+		return
+	case err != nil:
+		WriteCode(w, http.StatusInternalServerError)
+		return
+	}
+
+	code = "select body from Pairs where user=? and name=? limit 1"
+	var body string
+	err = DB.Get(&body, code, user, name)
+	switch {
+	case err == sql.ErrNoRows:
+		WriteCode(w, http.StatusNotFound)
+		return
+	case err != nil:
+		WriteCode(w, http.StatusInternalServerError)
+		return
+	}
+
+	Write(w, http.StatusOK, "%s", body)
+}
+
 // 4.2 · POST handlers
 ///////////////////////
 
@@ -162,6 +195,37 @@ func PostRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Write(w, http.StatusCreated, "%s", uuid)
+}
+
+// PostPair sets a new or existing key-value pair.
+func PostPair(w http.ResponseWriter, r *http.Request) {
+	uuid := Trim(r.PathValue("uuid"), 32)
+	name := Trim(r.PathValue("name"), 64) // use -rateName
+	body, err := Read(r)
+	if err != nil || body == "" {
+		WriteCode(w, http.StatusBadRequest)
+		return
+	}
+
+	var user int64
+	code := "select id from Users where uuid=? limit 1"
+	err = DB.Get(&user, code, uuid)
+	switch {
+	case err == sql.ErrNoRows:
+		WriteCode(w, http.StatusNotFound)
+		return
+	case err != nil:
+		WriteCode(w, http.StatusInternalServerError)
+		return
+	}
+
+	code = "insert into Pairs (user, name, body) values (?, ?, ?)"
+	if _, err := DB.Exec(code, user, name, body); err != nil {
+		WriteCode(w, http.StatusInternalServerError)
+		return
+	}
+
+	Write(w, http.StatusCreated, "ok")
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -196,6 +260,8 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("GET /", LogWare(GetIndex))
 	mux.Handle("POST /new", LogWare(PostRegister))
+	mux.Handle("POST /{uuid}/{name}", LogWare(PostPair))
+	mux.Handle("GET /{uuid}/{name}", LogWare(GetPair))
 
 	// Initialise server.
 	srv := &http.Server{
