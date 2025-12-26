@@ -21,10 +21,11 @@ const Schema = `
 	create table if not exists Pairs (
 		id   integer primary key asc,
 		init integer not null default (unixepoch()),
-		user integer not null references Users(id),
+		user integer not null,
 		name text    not null,
 		body text    not null,
 
+		foreign key (user) references Users(id) on delete cascade,
 		unique(user, name)
 	);
 
