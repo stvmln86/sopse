@@ -5,7 +5,18 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stvmln86/sopse/sopse/tests/asrt"
 )
+
+func TestDB(t *testing.T) {
+	// success
+	db := DB()
+	assert.NotNil(t, db)
+
+	// confirm - inserts
+	size := asrt.Get(t, db, "select count(*) from Users")
+	assert.NotZero(t, size)
+}
 
 func TestRequest(t *testing.T) {
 	// success
