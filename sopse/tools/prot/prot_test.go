@@ -28,9 +28,12 @@ func TestWrite(t *testing.T) {
 	Write(w, http.StatusOK, "text")
 	asrt.Response(t, w, http.StatusOK, "text")
 
-	// confirm - header
-	data := w.Header().Get("Content-Type")
-	assert.Equal(t, "text/plain; charset=utf-8", data)
+	// confirm - headers
+	assert.Subset(t, w.Header(), http.Header{
+		"Cache-Control":          {"no-store"},
+		"Content-Type":           {"text/plain; charset=utf-8"},
+		"X-Content-Type-Options": {"nosniff"},
+	})
 }
 
 func TestWriteCode(t *testing.T) {

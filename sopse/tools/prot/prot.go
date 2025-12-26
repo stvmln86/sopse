@@ -20,7 +20,9 @@ func Read(r *http.Request) (string, error) {
 
 // Write writes a text/plain string to a ResponseWriter.
 func Write(w http.ResponseWriter, code int, text string) {
+	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
 	w.Write([]byte(text))
 }
