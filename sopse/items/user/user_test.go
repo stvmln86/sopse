@@ -77,3 +77,37 @@ func TestExists(t *testing.T) {
 	assert.True(t, okay)
 	assert.NoError(t, err)
 }
+
+func TestGetPair(t *testing.T) {
+	// setup
+	user := mockUser(t)
+
+	// success
+	pair, err := user.GetPair("alpha")
+	assert.Equal(t, pair.DB, user.DB)
+	assert.Equal(t, int64(1), pair.ID)
+	assert.Equal(t, "Alpha.\n", pair.Body)
+	assert.Equal(t, int64(1000), pair.Init)
+	assert.Equal(t, "alpha", pair.Name)
+	assert.Equal(t, int64(1), pair.User)
+	assert.NoError(t, err)
+}
+
+func TestSetPair(t *testing.T) {
+	// setup
+	user := mockUser(t)
+
+	// success
+	pair, err := user.SetPair("zulu", "Zulu.\n")
+	assert.Equal(t, pair.DB, user.DB)
+	assert.Equal(t, int64(3), pair.ID)
+	assert.Equal(t, "Zulu.\n", pair.Body)
+	assert.Equal(t, time.Now().Unix(), pair.Init)
+	assert.Equal(t, "zulu", pair.Name)
+	assert.Equal(t, int64(1), pair.User)
+	assert.NoError(t, err)
+
+	// confirm - database
+	body := test.Get(t, pair.DB, "select body from Pairs where id=3")
+	assert.Equal(t, "Zulu.\n", body)
+}

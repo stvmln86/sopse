@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/stvmln86/sopse/sopse/items/pair"
 )
 
 // User is a single recorded user in the database.
@@ -77,4 +78,14 @@ func (u *User) Exists() (bool, error) {
 	}
 
 	return okay, nil
+}
+
+// GetPair returns an existing Pair by name.
+func (u *User) GetPair(name string) (*pair.Pair, error) {
+	return pair.Get(u.DB, u.ID, name)
+}
+
+// SetPair creates a new Pair or overwrites an existing Pair.
+func (u *User) SetPair(name, body string) (*pair.Pair, error) {
+	return pair.Set(u.DB, u.ID, name, body)
 }
