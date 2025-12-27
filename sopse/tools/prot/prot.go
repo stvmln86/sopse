@@ -4,16 +4,15 @@ package prot
 import (
 	"fmt"
 	"io"
-	"maps"
 	"net/http"
 	"strings"
 )
 
 // headers is a map of default HTTP response headers.
-var headers = http.Header{
-	"Cache-Control":          {"no-store"},
-	"Content-Type":           {"text/plain; charset=utf-8"},
-	"X-Content-Type-Options": {"nosniff"},
+var headers = map[string]string{
+	"Cache-Control":          "no-store",
+	"Content-Type":           "text/plain; charset=utf-8",
+	"X-Content-Type-Options": "nosniff",
 }
 
 // Read returns a Request's body as a string.
@@ -28,8 +27,11 @@ func Read(r *http.Request) string {
 
 // Write writes a formatted text/plain string to a ResponseWriter.
 func Write(w http.ResponseWriter, code int, text string, elems ...any) {
+	for attr, data := range headers {
+		w.Header().Set(attr, data)
+	}
+
 	w.WriteHeader(code)
-	maps.Copy(w.Header(), headers)
 	fmt.Fprintf(w, text, elems...)
 }
 

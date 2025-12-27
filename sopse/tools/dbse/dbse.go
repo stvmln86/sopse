@@ -36,8 +36,8 @@ const Schema = `
 		unique(user, name)
 	);
 
-	create index UserUUIDs on Users(uuid);
-	create index PairNames on Pairs(user, name);
+	create index if not exists UserUUIDs on Users(uuid);
+	create index if not exists PairNames on Pairs(user, name);
 `
 
 // Connect returns an initialised database connection.

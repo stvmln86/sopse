@@ -36,7 +36,9 @@ func TestWrite(t *testing.T) {
 	assert.Equal(t, "body", w.Body.String())
 
 	// confirm - headers
-	assert.Subset(t, w.Header(), headers)
+	for attr, data := range headers {
+		assert.Equal(t, data, w.Header().Get(attr))
+	}
 }
 
 func TestWriteCode(t *testing.T) {
