@@ -30,6 +30,16 @@ func TestNewConnect(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestClose(t *testing.T) {
+	// setup
+	db := test.MockDB(t)
+	app := New(db)
+
+	// success
+	err := app.Close()
+	assert.NoError(t, err)
+}
+
 func TestServer(t *testing.T) {
 	// setup
 	app := New(nil)

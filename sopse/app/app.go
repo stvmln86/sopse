@@ -2,6 +2,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -29,6 +30,15 @@ func NewConnect(path string) (*App, error) {
 	}
 
 	return New(db), nil
+}
+
+// Close closes the App's database.
+func (a *App) Close() error {
+	if err := a.DB.Close(); err != nil {
+		return fmt.Errorf("cannot close database - %w", err)
+	}
+
+	return nil
 }
 
 // Server returns a Server object from the App.

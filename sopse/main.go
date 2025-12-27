@@ -24,4 +24,5 @@ func main() {
 
 	log.Printf("starting Sopse on %s...", *flag.Addr)
 	try(app.Server().ListenAndServe())
+	try(app.Close())
 }
