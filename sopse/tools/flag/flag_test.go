@@ -11,10 +11,14 @@ func TestParse(t *testing.T) {
 	elems := []string{
 		"-addr", ":1234",
 		"-path", "path.db",
+		"-bodyMax", "1234",
+		"-nameMax", "1234",
 	}
 
 	// success
 	Parse(elems)
 	assert.Equal(t, ":1234", *Addr)
 	assert.Equal(t, "path.db", *Path)
+	assert.Equal(t, 1234, *BodyMax)
+	assert.Equal(t, 1234, *NameMax)
 }

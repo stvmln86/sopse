@@ -19,10 +19,12 @@ go install github.com/stvmln86/sopse@latest
 
 Sopse is configured entirely through command-line flags. 
 
-Name    | Description               | Default 
-------- | ------------------------- | -------
-`-addr` | The address to serve on.  | `"127.0.0.1:8000"`
-`-path` | The database path to use. | `"./sopse.db"`
+Name       | Description                | Default 
+---------- | -------------------------- | -------
+`-addr`    | The address to serve on.   | `"127.0.0.1:8000"`
+`-path`    | The database path to use.  | `"./sopse.db"`
+`-bodyMax` | Maximum pair body size.    | `4096`
+`-nameMax` | Maximum pair name size     | `64`
 
 ## Contributing
 
