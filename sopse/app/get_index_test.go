@@ -18,4 +18,13 @@ func TestGetIndex(t *testing.T) {
 	app.GetIndex(w, r)
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, Index, w.Body.String())
+
+	// setup
+	w = httptest.NewRecorder()
+	r = httptest.NewRequest("GET", "/nope", nil)
+
+	// failure - 404 error
+	app.GetIndex(w, r)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, "error 404: path /nope not found", w.Body.String())
 }
