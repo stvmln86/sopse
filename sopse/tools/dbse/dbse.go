@@ -1,5 +1,12 @@
-// Package sqls implements SQLite pragma and schema constants.
-package sqls
+// Package dbse implements database constants and functions.
+package dbse
+
+import (
+	"fmt"
+
+	"github.com/jmoiron/sqlx"
+	_ "github.com/mattn/go-sqlite3"
+)
 
 // Pragma is the default always-enabled database pragma.
 const Pragma = `
@@ -32,3 +39,17 @@ const Schema = `
 	create index UserUUIDs on Users(uuid);
 	create index PairNames on Pairs(user, name);
 `
+
+// Connect returns an initialised database connection.
+func Connect(path string) (*sqlx.DB, error) {
+	db, err := sqlx.Connect("sqlite3", path)
+	if err != nil {
+		return nil, fmt.Errorf("cannot open database %q - %w", path, err)
+	}
+
+	if _, err := db.Exec(Pragma + Schema); err != nil {
+		return nil, fmt.Errorf("cannot open database %q - %w", path, err)
+	}
+
+	return db, nil
+}

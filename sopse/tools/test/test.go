@@ -5,7 +5,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/stvmln86/sopse/sopse/tools/sqls"
+	"github.com/stvmln86/sopse/sopse/tools/dbse"
 )
 
 // MockData is additional database data for unit testing.
@@ -33,7 +33,7 @@ func MockDB(t *testing.T) *sqlx.DB {
 		t.Fatal(err)
 	}
 
-	if _, err := db.Exec(sqls.Pragma + sqls.Schema + MockData); err != nil {
+	if _, err := db.Exec(dbse.Pragma + dbse.Schema + MockData); err != nil {
 		t.Fatal(err)
 	}
 
