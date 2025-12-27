@@ -20,7 +20,7 @@ const Schema = `
 		id   integer primary key asc,
 		init integer not null default (unixepoch()),
 		uuid text    not null default (lower(hex(randomblob(8)))),
-		addr integer not null,
+		addr text    not null,
 
 		unique(uuid)
 	);
