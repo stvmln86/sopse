@@ -9,22 +9,12 @@ const Pragma = `
 
 // Schema is the default first-run database schema.
 const Schema = `
-	create table if not exists Addrs (
-		id   integer primary key asc,
-		init integer not null default (unixepoch()),
-		addr text    not null,
-		agnt text    not null,
-
-		unique(addr)
-	);
-
 	create table if not exists Users (
 		id   integer primary key asc,
 		init integer not null default (unixepoch()),
 		uuid text    not null default (lower(hex(randomblob(8)))),
 		addr integer not null,
 
-		foreign key (addr) references Addrs(id),
 		unique(uuid)
 	);
 
@@ -39,7 +29,6 @@ const Schema = `
 		unique(user, name)
 	);
 
-	create index AddrAddrs on Addrs(addr);
 	create index UserUUIDs on Users(uuid);
 	create index PairNames on Pairs(user, name);
 `
