@@ -3,6 +3,7 @@ package dbse
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
@@ -47,6 +48,8 @@ func Connect(path string) (*sqlx.DB, error) {
 		return nil, fmt.Errorf("cannot open database %q - %w", path, err)
 	}
 
+	db.SetConnMaxIdleTime(10 * time.Second)
+	db.SetConnMaxLifetime(10 * time.Second)
 	if _, err := db.Exec(Pragma + Schema); err != nil {
 		return nil, fmt.Errorf("cannot open database %q - %w", path, err)
 	}
