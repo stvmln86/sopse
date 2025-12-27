@@ -1,4 +1,4 @@
-// Package flag implements comand-line parsing globals and functions.
+// Package flag implements command-line parsing globals and functions.
 package flag
 
 import (
