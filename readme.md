@@ -1,6 +1,6 @@
 # Sopse
 
-**Sopse** (*Stephen's Obsessive Pair Storage Engine*) is a private key-value storage webapp, written in Go 1.25 by Stephen Malone.
+**Sopse** (*Stephen's Obsessive Pair Storage Engine*) is a public ephemeral key-value storage API, written in Go 1.25 by Stephen Malone.
 
 - See [`changes.md`][ch] for the complete changelog.
 - See [`license.md`][li] for the open-source license (BSD-3).
@@ -19,10 +19,10 @@ go install github.com/stvmln86/sopse@latest
 
 Sopse is configured entirely through command-line flags. 
 
-Name    | Description                 | Default 
-------- | --------------------------- | -------
-`-addr` | The address to serve on.    | `"127.0.0.1:8000"`
-`-dbug` | Enable debugging mode.      | `false`
+Name    | Description               | Default 
+------- | ------------------------- | -------
+`-addr` | The address to serve on.  | `"127.0.0.1:8000"`
+`-path` | The database path to use. | `"./sopse.db"`
 
 ## Contributing
 
