@@ -1,24 +1,25 @@
 package prot
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stvmln86/sopse/sopse/tools/test"
 )
 
 func TestRead(t *testing.T) {
 	// setup
-	r := test.Request("GET", "/", "body")
+	buff := bytes.NewBufferString("body")
+	r := httptest.NewRequest("GET", "/", buff)
 
 	// success - normal body
 	body := Read(r)
 	assert.Equal(t, "body", body)
 
 	// setup
-	r.Body = nil
+	r = httptest.NewRequest("GET", "/", nil)
 
 	// success - nil body
 	body = Read(r)

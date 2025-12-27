@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stvmln86/sopse/sopse/tools/test"
 )
 
 func mockHandler(w http.ResponseWriter, _ *http.Request) {
@@ -24,7 +23,7 @@ func TestApply(t *testing.T) {
 
 func TestLogWare(t *testing.T) {
 	// setup
-	r := test.Request("GET", "/", "")
+	r := httptest.NewRequest("GET", "/", nil)
 	w := httptest.NewRecorder()
 	buff := new(bytes.Buffer)
 	hand := LogWare(http.HandlerFunc(mockHandler))
