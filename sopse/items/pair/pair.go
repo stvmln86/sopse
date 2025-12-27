@@ -46,18 +46,12 @@ func Get(db *sqlx.DB, user int64, name string) (*Pair, error) {
 
 // Set creates a new Pair or overwrites an existing Pair.
 func Set(db *sqlx.DB, user int64, name, body string) (*Pair, error) {
-	rslt, err := db.Exec(upsert, user, name, body)
-	if err != nil {
-		return nil, fmt.Errorf("cannot set Pair %q - %w", name, err)
-	}
-
-	last, err := rslt.LastInsertId()
-	if err != nil {
+	if _, err := db.Exec(upsert, user, name, body); err != nil {
 		return nil, fmt.Errorf("cannot set Pair %q - %w", name, err)
 	}
 
 	pair := &Pair{DB: db}
-	if err := db.Get(pair, selectID, last); err != nil {
+	if err := db.Get(pair, selectName, user, name); err != nil {
 		return nil, fmt.Errorf("cannot set Pair %q - %w", name, err)
 	}
 
