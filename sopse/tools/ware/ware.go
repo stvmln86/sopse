@@ -36,7 +36,7 @@ func (w *logWriter) Write(bytes []byte) (int, error) {
 func LogWare(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		init := time.Now()
-		wrap := &logWriter{w, http.StatusOK, 0}
+		wrap := &logWriter{ResponseWriter: w, Code: http.StatusOK, Size: 0}
 		next.ServeHTTP(wrap, r)
 		secs := time.Since(init).Seconds()
 		log.Printf(

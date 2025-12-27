@@ -32,7 +32,7 @@ const Schema = `
 		name text    not null,
 		body text    not null,
 
-		foreign key (user) references Users(id),
+		foreign key (user) references Users(id) on delete cascade,
 		unique(user, name)
 	);
 
