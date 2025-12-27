@@ -7,23 +7,36 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stvmln86/sopse/sopse/tools/flag"
 )
 
 func TestRead(t *testing.T) {
 	// setup
-	buff := bytes.NewBufferString("body")
-	r := httptest.NewRequest("GET", "/", buff)
+	w := httptest.NewRecorder()
+	b := bytes.NewBufferString("body")
+	r := httptest.NewRequest("GET", "/", b)
 
 	// success - normal body
-	body := Read(r)
+	body := Read(w, r)
 	assert.Equal(t, "body", body)
 
 	// setup
+	w = httptest.NewRecorder()
 	r = httptest.NewRequest("GET", "/", nil)
 
 	// success - nil body
-	body = Read(r)
+	body = Read(w, r)
 	assert.Empty(t, body)
+
+	// setup
+	w = httptest.NewRecorder()
+	b = bytes.NewBufferString("body")
+	r = httptest.NewRequest("GET", "/", b)
+	*flag.BodyMax = 1
+
+	// success - oversize body
+	body = Read(w, r)
+	assert.Equal(t, "b", body)
 }
 
 func TestWrite(t *testing.T) {

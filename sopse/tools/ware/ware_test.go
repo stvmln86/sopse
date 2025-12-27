@@ -23,12 +23,12 @@ func TestApply(t *testing.T) {
 
 func TestLogWare(t *testing.T) {
 	// setup
+	b := new(bytes.Buffer)
 	r := httptest.NewRequest("GET", "/", nil)
 	w := httptest.NewRecorder()
-	buff := new(bytes.Buffer)
 	hand := LogWare(http.HandlerFunc(mockHandler))
 	log.SetFlags(0)
-	log.SetOutput(buff)
+	log.SetOutput(b)
 
 	// success
 	hand.ServeHTTP(w, r)
@@ -36,5 +36,5 @@ func TestLogWare(t *testing.T) {
 	assert.Equal(t, "body", w.Body.String())
 
 	// confirm - logging
-	assert.Regexp(t, `192.0.2.1:1234 GET / :: 200 4 0.\d{5}`, buff.String())
+	assert.Regexp(t, `192.0.2.1:1234 GET / :: 200 4 0.\d{5}`, b.String())
 }

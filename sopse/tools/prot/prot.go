@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/stvmln86/sopse/sopse/tools/flag"
 )
 
 // headers is a map of default HTTP response headers.
@@ -15,12 +17,13 @@ var headers = map[string]string{
 	"X-Content-Type-Options": "nosniff",
 }
 
-// Read returns a Request's body as a string.
-func Read(r *http.Request) string {
+// Read returns a Request's body as a string, capped to flag.BodyMax.
+func Read(w http.ResponseWriter, r *http.Request) string {
 	if r.Body == nil {
 		return ""
 	}
 
+	r.Body = http.MaxBytesReader(w, r.Body, int64(*flag.BodyMax))
 	bytes, _ := io.ReadAll(r.Body)
 	return string(bytes)
 }
