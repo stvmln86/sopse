@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"io"
 	"log"
@@ -41,6 +42,9 @@ const Schema = `
 		foreign key (user) references Users(id),
 		unique(user, name)
 	);
+
+	insert into Users (uuid, addr) values ('aaaa', '1.1.1.1');
+	insert into Pairs (user, name, body) values (1, 'alpha', 'Alpha body.' || char(10));
 `
 
 ////////////////////////////////// protocol functions //////////////////////////////////
@@ -105,6 +109,38 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 	Success(w, http.StatusOK, map[string]any{"pairs": size})
 }
 
+func GetPair(w http.ResponseWriter, r *http.Request) {
+	var user int64
+	uuid := r.PathValue("uuid")
+	err := DB.Get(&user, "select id from Users where uuid=?", uuid)
+	switch {
+	case err == sql.ErrNoRows:
+		Failure(w, http.StatusNotFound, map[string]string{
+			"user": "does not exist",
+		})
+		return
+	case err != nil:
+		Error(w, http.StatusInternalServerError)
+		return
+	}
+
+	var body string
+	name := r.PathValue("name")
+	err = DB.Get(&body, "select body from Pairs where user=? and name=?", user, name)
+	switch {
+	case err == sql.ErrNoRows:
+		Failure(w, http.StatusNotFound, map[string]string{
+			"pair": "does not exist",
+		})
+		return
+	case err != nil:
+		Error(w, http.StatusInternalServerError)
+		return
+	}
+
+	Success(w, http.StatusOK, map[string]any{"body": body})
+}
+
 func PostUser(w http.ResponseWriter, r *http.Request) {
 	addr, _, _ := net.SplitHostPort(r.RemoteAddr)
 	rslt, err := DB.Exec("insert into Users (addr) values (?)", addr)
@@ -153,6 +189,7 @@ func main() {
 	// init muxer
 	mux := http.NewServeMux()
 	mux.Handle("GET /", LogWare(GetIndex))
+	mux.Handle("GET /{uuid}/{name}", LogWare(GetPair))
 	mux.Handle("POST /", LogWare(PostUser))
 
 	// init server
