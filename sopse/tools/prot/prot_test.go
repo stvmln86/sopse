@@ -31,10 +31,8 @@ func TestWrite(t *testing.T) {
 
 	// success
 	Write(w, http.StatusOK, "%s", "body")
-	code, body, err := test.Response(w)
-	assert.Equal(t, http.StatusOK, code)
-	assert.Equal(t, "body", body)
-	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "body", w.Body.String())
 
 	// confirm - headers
 	assert.Subset(t, w.Header(), headers)
@@ -46,10 +44,8 @@ func TestWriteCode(t *testing.T) {
 
 	// success
 	WriteCode(w, http.StatusInternalServerError)
-	code, body, err := test.Response(w)
-	assert.Equal(t, http.StatusInternalServerError, code)
-	assert.Equal(t, "error 500: internal server error", body)
-	assert.NoError(t, err)
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Equal(t, "error 500: internal server error", w.Body.String())
 }
 
 func TestWriteError(t *testing.T) {
@@ -58,8 +54,6 @@ func TestWriteError(t *testing.T) {
 
 	// success
 	WriteError(w, http.StatusBadRequest, "%s", "body")
-	code, body, err := test.Response(w)
-	assert.Equal(t, http.StatusBadRequest, code)
-	assert.Equal(t, "error 400: body", body)
-	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, "error 400: body", w.Body.String())
 }

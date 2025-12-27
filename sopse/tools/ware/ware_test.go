@@ -33,10 +33,8 @@ func TestLogWare(t *testing.T) {
 
 	// success
 	hand.ServeHTTP(w, r)
-	code, body, err := test.Response(w)
-	assert.Equal(t, http.StatusOK, code)
-	assert.Equal(t, "body", body)
-	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "body", w.Body.String())
 
 	// confirm - logging
 	assert.Regexp(t, `192.0.2.1:1234 GET / :: 200 4 0.\d{5}`, buff.String())
