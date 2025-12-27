@@ -30,6 +30,10 @@ func TestCreate(t *testing.T) {
 	assert.Equal(t, time.Now().Unix(), user.Init)
 	assert.Len(t, user.UUID, 16)
 	assert.NoError(t, err)
+
+	// confirm - database
+	addr := test.Get(t, user.DB, "select addr from Users where id=2")
+	assert.Equal(t, "9.9.9.9", addr)
 }
 
 func TestGet(t *testing.T) {
