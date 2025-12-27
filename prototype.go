@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"strings"
 
@@ -23,11 +24,11 @@ const Pragma = `
 const Schema = `
 	create table if not exists Users (
 		id   integer primary key asc,
-		hash text    not null default (lower(randomblob(16))),
+		uuid text    not null default (lower(hex(randomblob(16)))),
 		init integer not null default (unixepoch()),
 		addr text    not null,
 
-		unique(hash)
+		unique(uuid)
 	);
 
 	create table if not exists Pairs (
@@ -37,6 +38,7 @@ const Schema = `
 		name text    not null,
 		body text    not null,
 
+		foreign key (user) references Users(id),
 		unique(user, name)
 	);
 `
@@ -103,6 +105,29 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 	Success(w, http.StatusOK, map[string]any{"pairs": size})
 }
 
+func PostUser(w http.ResponseWriter, r *http.Request) {
+	addr, _, _ := net.SplitHostPort(r.RemoteAddr)
+	rslt, err := DB.Exec("insert into Users (addr) values (?)", addr)
+	if err != nil {
+		Error(w, http.StatusInternalServerError)
+		return
+	}
+
+	last, err := rslt.LastInsertId()
+	if err != nil {
+		Error(w, http.StatusInternalServerError)
+		return
+	}
+
+	var uuid string
+	if err := DB.Get(&uuid, "select uuid from Users where id=?", last); err != nil {
+		Error(w, http.StatusInternalServerError)
+		return
+	}
+
+	Success(w, http.StatusCreated, map[string]any{"uuid": uuid})
+}
+
 ///////////////////////////////// middleware functions /////////////////////////////////
 
 func LogWare(next http.HandlerFunc) http.Handler {
@@ -122,12 +147,13 @@ func try(err error) {
 
 func main() {
 	// init db
-	DB = sqlx.MustConnect("sqlite3", "sopse.db")
+	DB = sqlx.MustConnect("sqlite3", ":memory:")
 	DB.MustExec(Pragma + Schema)
 
 	// init muxer
 	mux := http.NewServeMux()
 	mux.Handle("GET /", LogWare(GetIndex))
+	mux.Handle("POST /", LogWare(PostUser))
 
 	// init server
 	srv := &http.Server{Addr: ":8000", Handler: mux}
