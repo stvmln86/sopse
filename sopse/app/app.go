@@ -8,6 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/stvmln86/sopse/sopse/tools/dbse"
 	"github.com/stvmln86/sopse/sopse/tools/flag"
+	"github.com/stvmln86/sopse/sopse/tools/ware"
 )
 
 // App is a top-level server controller.
@@ -33,8 +34,7 @@ func NewConnect(path string) (*App, error) {
 // Server returns a Server object from the App.
 func (a *App) Server() *http.Server {
 	smux := http.NewServeMux()
-	// smux.Handle("GET /", ware.Apply(a.GetIndex))
-	// etc ...
+	smux.Handle("GET /", ware.Apply(a.GetIndex))
 
 	return &http.Server{
 		Addr:         *flag.Addr,
