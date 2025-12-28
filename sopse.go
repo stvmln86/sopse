@@ -13,10 +13,12 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/time/rate"
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -31,6 +33,9 @@ var DB *sqlx.DB
 
 // Uptime is the system start time.
 var Uptime = time.Now()
+
+// RateLimits tracks rate limiters per IP address.
+var RateLimits = &rateLimits{Addrs: make(map[string]*rate.Limiter)}
 
 // 1.2 · configuration flags
 /////////////////////////////
@@ -291,7 +296,7 @@ func PostSetPair(w http.ResponseWriter, r *http.Request) {
 
 // ApplyWare applies all middleware to a HandlerFunc.
 func ApplyWare(next http.HandlerFunc) http.Handler {
-	return LogWare(next)
+	return LogWare(RateWare(http.HandlerFunc(next)))
 }
 
 // logWriter is a custom ResponseWriter for logging middleware.
@@ -325,6 +330,34 @@ func LogWare(next http.Handler) http.Handler {
 			"%s %s %s :: %d %d %1.5f",
 			r.RemoteAddr, r.Method, r.URL.Path, wrap.Code, wrap.Size, secs,
 		)
+	})
+}
+
+type rateLimits struct {
+	sync.RWMutex
+	Addrs map[string]*rate.Limiter
+}
+
+// RateWare is a middleware that enforces rate limiting per IP address.
+func RateWare(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		addr := Addr(r)
+
+		RateLimits.Lock()
+		if _, ok := RateLimits.Addrs[addr]; !ok {
+			RateLimits.Addrs[addr] = rate.NewLimiter(
+				rate.Limit(float64(*FlagRate)/3600.0),
+				*FlagRate,
+			)
+		}
+
+		RateLimits.Unlock()
+		if !RateLimits.Addrs[addr].Allow() {
+			WriteError(w, http.StatusTooManyRequests, "rate limit exceeded")
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }
 

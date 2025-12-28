@@ -16,6 +16,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/time/rate"
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -300,4 +301,29 @@ func TestLogWare(t *testing.T) {
 
 	// confirm - logs
 	assert.Regexp(t, `192\.0\.2\.1:1234 GET \/ :: 200 4 0\.\d{5}`, b.String())
+}
+
+func TestRateWare(t *testing.T) {
+	// setup - clear rate limits
+	RateLimits.Addrs = make(map[string]*rate.Limiter)
+	*FlagRate = 5
+
+	// success - requests under limit
+	for range 5 {
+		r := httptest.NewRequest("GET", "/", nil)
+		w := httptest.NewRecorder()
+		RateWare(http.HandlerFunc(mockHandler)).ServeHTTP(w, r)
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, "body", w.Body.String())
+	}
+
+	// failure - rate limit exceeded
+	r := httptest.NewRequest("GET", "/", nil)
+	w := httptest.NewRecorder()
+	RateWare(http.HandlerFunc(mockHandler)).ServeHTTP(w, r)
+	assert.Equal(t, http.StatusTooManyRequests, w.Code)
+	assert.Equal(t, "error 429: rate limit exceeded", w.Body.String())
+
+	// confirm - limiter exists for IP
+	assert.NotNil(t, RateLimits.Addrs["192.0.2.1"])
 }
