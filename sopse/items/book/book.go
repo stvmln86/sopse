@@ -7,6 +7,6 @@ import (
 
 // Book is a directory of stored user files.
 type Book struct {
-	Dire  string       `json:"-"`
-	mutex sync.RWMutex `json:"-"`
+	Dire  string        `json:"-"`
+	mutex *sync.RWMutex `json:"-"`
 }

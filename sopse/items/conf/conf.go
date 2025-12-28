@@ -5,6 +5,7 @@ package conf
 type Conf struct {
 	Addr    string `json:"addr"`
 	Dire    string `json:"dire"`
+	Salt    string `json:"salt"`
 	BodyMax int64  `json:"body_max"`
 	PairTTL int64  `json:"pair_ttl"`
 	RateMax int64  `json:"rate_max"`

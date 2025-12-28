@@ -20,7 +20,11 @@ func New(body string, inits ...int64) *Pair {
 		inits = append(inits, time.Now().Unix())
 	}
 
-	return &Pair{body, neat.Hash(body), inits[0]}
+	return &Pair{
+		Body: body,
+		Hash: neat.Hash(body),
+		Init: inits[0],
+	}
 }
 
 // Check returns true if the Pair's body matches its hash.
