@@ -27,7 +27,7 @@ func AssertFile(t *testing.T, orig string, data any) {
 
 // TempFile returns a temporary file containing a JSON value.
 func TempFile(t *testing.T, data any) string {
-	dest := filepath.Join(t.TempDir(), t.Name()+".json")
+	dest := TempPath(t)
 	bytes, err := json.Marshal(data)
 	if err != nil {
 		t.Fatal(err)
@@ -38,4 +38,9 @@ func TempFile(t *testing.T, data any) string {
 	}
 
 	return dest
+}
+
+// TempPath returns a temporary file path.
+func TempPath(t *testing.T) string {
+	return filepath.Join(t.TempDir(), t.Name()+".json")
 }
