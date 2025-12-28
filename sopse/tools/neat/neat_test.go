@@ -27,7 +27,7 @@ func TestHash(t *testing.T) {
 }
 
 func TestTime(t *testing.T) {
-	want := time.Unix(1000, 0).Local()
-	tobj := Time(1000)
+	want := time.Unix(100, 0).Local()
+	tobj := Time(100)
 	assert.Equal(t, want, tobj)
 }
