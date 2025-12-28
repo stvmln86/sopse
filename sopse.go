@@ -6,6 +6,8 @@ package main
 
 import (
 	"flag"
+	"log"
+	"net/http"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -71,11 +73,43 @@ const Schema = `
 `
 
 ////////////////////////////////////////////////////////////////////////////////////////
+//                              part ??? · main function                              //
+////////////////////////////////////////////////////////////////////////////////////////
+
+// main runs the main Sopse program.
+func main() {
+	// Parse command-line arguments.
+	flag.Parse()
+
+	// Initialise database.
+	DB = sqlx.MustConnect("sqlite3", *FlagPath)
+	DB.MustExec(Pragma + Schema)
+
+	// Initialise ServeMux and handlers.
+	smux := http.NewServeMux()
+
+	// Initialise Server.
+	serv := &http.Server{
+		Addr:           *FlagAddr,
+		Handler:        smux,
+		MaxHeaderBytes: 8192,
+		IdleTimeout:    10 * time.Second,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+	}
+
+	// Start Server.
+	defer serv.Close()
+	if err := serv.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
 //                                    project notes                                   //
 ////////////////////////////////////////////////////////////////////////////////////////
 
 /*
 # 2025-12-28
 - don't limit path value sizes (uuid, name, etc)
-- use -bodySize as Server.MaxHeaderBytes
 */
