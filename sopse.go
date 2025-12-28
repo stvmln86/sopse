@@ -162,20 +162,23 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var ulen int
-	if err := DB.Get(&ulen, "select count(*) from Users"); err != nil {
-		WriteCode(w, http.StatusInternalServerError)
-		return
+	var stats struct {
+		Users int `db:"users"`
+		Pairs int `db:"pairs"`
 	}
 
-	var plen int
-	if err := DB.Get(&plen, "select count(*) from Pairs"); err != nil {
+	err := DB.Get(&stats, `select
+		(select count(*) from Users) as users,
+        (select count(*) from Pairs) as pairs;
+	`)
+
+	if err != nil {
 		WriteCode(w, http.StatusInternalServerError)
 		return
 	}
 
 	dura := time.Since(Uptime).Round(1 * time.Second).String()
-	Write(w, http.StatusOK, Index, dura, ulen, plen)
+	Write(w, http.StatusOK, Index, dura, stats.Users, stats.Pairs)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
