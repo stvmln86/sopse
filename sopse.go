@@ -6,8 +6,11 @@ package main
 
 import (
 	"flag"
+	"io"
 	"log"
+	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -71,6 +74,36 @@ const Schema = `
 	create index if not exists UserUUIDs on Users(uuid);
 	create index if not exists PairNames on Pairs(user, name);
 `
+
+////////////////////////////////////////////////////////////////////////////////////////
+//                        part two · data processing functions                        //
+////////////////////////////////////////////////////////////////////////////////////////
+
+// 2.1 · request functions
+///////////////////////////
+
+// Addr returns the remote IP address from a Request.
+func Addr(r *http.Request) string {
+	addr, _, _ := net.SplitHostPort(r.RemoteAddr)
+	return addr
+}
+
+// Body returns a Request's body as a whitespace-trimmed string.
+func Body(w http.ResponseWriter, r *http.Request) string {
+	if r.Body == nil {
+		return ""
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, int64(*FlagSize))
+	bytes, _ := io.ReadAll(r.Body)
+	return strings.TrimSpace(string(bytes))
+}
+
+// PathValue returns a lowercase Request path value.
+func PathValue(r *http.Request, name string) string {
+	data := r.PathValue(name)
+	return strings.ToLower(data)
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //                              part ??? · main function                              //
