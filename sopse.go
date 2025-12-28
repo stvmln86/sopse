@@ -5,6 +5,7 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"io"
@@ -81,10 +82,18 @@ const Schema = `
 
 // SQLite query constants.
 const (
-	insertUser  = `insert into Users (addr) values (?) returning uuid`
+	insertUser = `
+		insert into Users (addr) values (?) returning uuid
+	`
+
 	selectStats = `select
 		(select count(*) from Users) as users,
 		(select count(*) from Pairs) as pairs;
+	`
+
+	upsertPair = `
+		insert into Pairs (user, name, body) values (?, ?, ?)
+		on conflict (user, name) do update set body = excluded.body
 	`
 )
 
@@ -200,6 +209,32 @@ func PostCreateUser(w http.ResponseWriter, r *http.Request) {
 	Write(w, http.StatusCreated, "%s", uuid)
 }
 
+// PostSetPair sets a new or existing user pair.
+func PostSetPair(w http.ResponseWriter, r *http.Request) {
+	body := Body(w, r)
+	uuid := PathValue(r, "uuid")
+	name := PathValue(r, "name")
+
+	var user int64
+	err := DB.Get(&user, `select id from Users where uuid=?`, uuid)
+
+	switch {
+	case err == sql.ErrNoRows:
+		WriteError(w, http.StatusNotFound, "user %s not found", uuid)
+		return
+	case err != nil:
+		WriteCode(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if _, err = DB.Exec(upsertPair, user, name, body); err != nil {
+		WriteCode(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	Write(w, http.StatusOK, "ok")
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //                        part five · http middleware functions                       //
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -269,6 +304,7 @@ func main() {
 	// Initialise multiplexer and handlers.
 	smux := http.NewServeMux()
 	smux.Handle("POST /new", ApplyWare(PostCreateUser))
+	smux.Handle("POST /{uuid}/{name}", ApplyWare(PostSetPair))
 	smux.Handle("GET /", ApplyWare(GetIndex))
 
 	// Initialise server.

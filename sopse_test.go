@@ -23,7 +23,9 @@ import (
 ////////////////////////////////////////////////////////////////////////////////////////
 
 // mockData is mock database data for unit testing.
-const mockData = ``
+const mockData = `
+	insert into Users (uuid, addr) values ('mockuser', '192.0.2.1');
+`
 
 // mockDB initialises DB as an in-memory database populated with mockData.
 func mockDB() {
@@ -189,6 +191,38 @@ func TestPostCreateUser(t *testing.T) {
 	err := DB.Get(&addr, "select addr from Users where uuid=?", body)
 	assert.Equal(t, "192.0.2.1", addr)
 	assert.NoError(t, err)
+}
+
+func TestPostSetPair(t *testing.T) {
+	// setup
+	b := bytes.NewBufferString("body")
+	r := httptest.NewRequest("POST", "/mockuser/mockpair", b)
+	w := httptest.NewRecorder()
+	r.SetPathValue("uuid", "mockuser")
+	r.SetPathValue("name", "mockpair")
+	mockDB()
+
+	// success
+	PostSetPair(w, r)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "ok", w.Body.String())
+
+	// confirm - database
+	var body string
+	err := DB.Get(&body, "select body from Pairs where name='mockpair'")
+	assert.Equal(t, "body", body)
+	assert.NoError(t, err)
+
+	// setup
+	r = httptest.NewRequest("POST", "/nope/nope", nil)
+	w = httptest.NewRecorder()
+	r.SetPathValue("uuid", "nope")
+	r.SetPathValue("name", "nope")
+
+	// failure - user not found
+	PostSetPair(w, r)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, "error 404: user nope not found", w.Body.String())
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
