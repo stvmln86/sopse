@@ -86,6 +86,12 @@ const (
 		insert into Users (addr) values (?) returning uuid
 	`
 
+	selectPair = `
+		select body from Pairs
+		join Users on Pairs.user = Users.id
+		where Users.uuid=? and Pairs.name=? limit 1
+	`
+
 	selectStats = `select
 		(select count(*) from Users) as users,
 		(select count(*) from Pairs) as pairs;
@@ -193,6 +199,25 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 
 	dura := time.Since(Uptime).Round(1 * time.Second).String()
 	Write(w, http.StatusOK, Index, dura, stats.Users, stats.Pairs)
+}
+
+// GetPair returns an existing user pair.
+func GetPair(w http.ResponseWriter, r *http.Request) {
+	uuid := PathValue(r, "uuid")
+	name := PathValue(r, "name")
+
+	var body string
+	err := DB.Get(&body, selectPair, uuid, name)
+	switch {
+	case err == sql.ErrNoRows:
+		WriteError(w, http.StatusNotFound, "pair %s/%s not found", uuid, name)
+		return
+	case err != nil:
+		WriteCode(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	Write(w, http.StatusOK, "%s", body)
 }
 
 // 4.2 · post handlers
@@ -303,9 +328,10 @@ func main() {
 
 	// Initialise multiplexer and handlers.
 	smux := http.NewServeMux()
-	smux.Handle("POST /new", ApplyWare(PostCreateUser))
-	smux.Handle("POST /{uuid}/{name}", ApplyWare(PostSetPair))
 	smux.Handle("GET /", ApplyWare(GetIndex))
+	smux.Handle("GET /api/{uuid}/{name}", ApplyWare(GetPair))
+	smux.Handle("POST /api/new", ApplyWare(PostCreateUser))
+	smux.Handle("POST /api/{uuid}/{name}", ApplyWare(PostSetPair))
 
 	// Initialise server.
 	serv := &http.Server{

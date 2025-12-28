@@ -25,6 +25,7 @@ import (
 // mockData is mock database data for unit testing.
 const mockData = `
 	insert into Users (uuid, addr) values ('mockuser', '192.0.2.1');
+	insert into Pairs (user, name, body) values (1, 'mockpair', 'body');
 `
 
 // mockDB initialises DB as an in-memory database populated with mockData.
@@ -171,6 +172,31 @@ func TestGetIndex(t *testing.T) {
 	assert.Equal(t, "error 404: path /nope not found", w.Body.String())
 }
 
+func TestGetPair(t *testing.T) {
+	// setup
+	r := httptest.NewRequest("GET", "/mockuser/mockpair", nil)
+	w := httptest.NewRecorder()
+	r.SetPathValue("uuid", "mockuser")
+	r.SetPathValue("name", "mockpair")
+	mockDB()
+
+	// success
+	GetPair(w, r)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "body", w.Body.String())
+
+	// setup
+	r = httptest.NewRequest("GET", "/nope/nope", nil)
+	w = httptest.NewRecorder()
+	r.SetPathValue("uuid", "nope")
+	r.SetPathValue("name", "nope")
+
+	// failure - pair not found
+	GetPair(w, r)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, "error 404: pair nope/nope not found", w.Body.String())
+}
+
 // 4.2 · post handlers
 ///////////////////////
 
@@ -196,10 +222,10 @@ func TestPostCreateUser(t *testing.T) {
 func TestPostSetPair(t *testing.T) {
 	// setup
 	b := bytes.NewBufferString("body")
-	r := httptest.NewRequest("POST", "/mockuser/mockpair", b)
+	r := httptest.NewRequest("POST", "/mockuser/name", b)
 	w := httptest.NewRecorder()
 	r.SetPathValue("uuid", "mockuser")
-	r.SetPathValue("name", "mockpair")
+	r.SetPathValue("name", "name")
 	mockDB()
 
 	// success
@@ -209,7 +235,7 @@ func TestPostSetPair(t *testing.T) {
 
 	// confirm - database
 	var body string
-	err := DB.Get(&body, "select body from Pairs where name='mockpair'")
+	err := DB.Get(&body, "select body from Pairs where name='name'")
 	assert.Equal(t, "body", body)
 	assert.NoError(t, err)
 
