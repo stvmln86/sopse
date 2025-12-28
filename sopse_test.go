@@ -6,6 +6,7 @@ package main
 
 import (
 	"bytes"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -57,9 +58,9 @@ func TestAddr(t *testing.T) {
 
 func TestBody(t *testing.T) {
 	// setup
-	w := httptest.NewRecorder()
 	b := bytes.NewBufferString("body\n...")
 	r := httptest.NewRequest("GET", "/", b)
+	w := httptest.NewRecorder()
 	*FlagSize = 5
 
 	// success
@@ -75,4 +76,43 @@ func TestPathValue(t *testing.T) {
 	// success
 	data := PathValue(r, "name")
 	assert.Equal(t, "data", data)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//                        part three · http response functions                        //
+////////////////////////////////////////////////////////////////////////////////////////
+
+func TestWrite(t *testing.T) {
+	// setup
+	w := httptest.NewRecorder()
+
+	// success
+	Write(w, http.StatusOK, "%s", "body")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "body", w.Body.String())
+
+	// confirm - headers
+	assert.Equal(t, "no-store", w.Header().Get("Cache-Control"))
+	assert.Equal(t, "text/plain; charset=utf-8", w.Header().Get("Content-Type"))
+	assert.Equal(t, "nosniff", w.Header().Get("X-Content-Type-Options"))
+}
+
+func TestWriteCode(t *testing.T) {
+	// setup
+	w := httptest.NewRecorder()
+
+	// success
+	WriteCode(w, http.StatusInternalServerError)
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Equal(t, "error 500: internal server error", w.Body.String())
+}
+
+func TestWriteError(t *testing.T) {
+	// setup
+	w := httptest.NewRecorder()
+
+	// success
+	WriteError(w, http.StatusBadRequest, "%s", "body")
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, "error 400: body", w.Body.String())
 }

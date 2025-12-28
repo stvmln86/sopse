@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -79,9 +80,6 @@ const Schema = `
 //                        part two · data processing functions                        //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-// 2.1 · request functions
-///////////////////////////
-
 // Addr returns the remote IP address from a Request.
 func Addr(r *http.Request) string {
 	addr, _, _ := net.SplitHostPort(r.RemoteAddr)
@@ -103,6 +101,31 @@ func Body(w http.ResponseWriter, r *http.Request) string {
 func PathValue(r *http.Request, name string) string {
 	data := r.PathValue(name)
 	return strings.ToLower(data)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//                        part three · http response functions                        //
+////////////////////////////////////////////////////////////////////////////////////////
+
+// Write writes a formatted text/plain string to a ResponseWriter.
+func Write(w http.ResponseWriter, code int, text string, elems ...any) {
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(code)
+	fmt.Fprintf(w, text, elems...)
+}
+
+// WriteCode writes a text/plain error code to a ResponseWriter.
+func WriteCode(w http.ResponseWriter, code int) {
+	stat := http.StatusText(code)
+	Write(w, code, "error %d: %s", code, strings.ToLower(stat))
+}
+
+// WriteError writes a formatted text/plain error string to a ResponseWriter.
+func WriteError(w http.ResponseWriter, code int, text string, elems ...any) {
+	text = fmt.Sprintf(text, elems...)
+	Write(w, code, "error %d: %s", code, text)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -137,12 +160,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
-////////////////////////////////////////////////////////////////////////////////////////
-//                                    project notes                                   //
-////////////////////////////////////////////////////////////////////////////////////////
-
-/*
-# 2025-12-28
-- don't limit path value sizes (uuid, name, etc)
-*/
