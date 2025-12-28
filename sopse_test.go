@@ -6,6 +6,8 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -17,6 +19,11 @@ import (
 ////////////////////////////////////////////////////////////////////////////////////////
 //                          part zero · test data and helpers                         //
 ////////////////////////////////////////////////////////////////////////////////////////
+
+// mockHandler is a mock HandlerFunc for middleware testing.
+func mockHandler(w http.ResponseWriter, _ *http.Request) {
+	fmt.Fprint(w, "body")
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //                          part one · constants and globals                          //
@@ -139,4 +146,31 @@ func TestGetIndex(t *testing.T) {
 	GetIndex(w, r)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 	assert.Equal(t, "error 404: path /nope not found", w.Body.String())
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//                        part five · http middleware functions                       //
+////////////////////////////////////////////////////////////////////////////////////////
+
+func TestApplyWare(t *testing.T) {
+	// success
+	hand := ApplyWare(mockHandler)
+	assert.NotNil(t, hand)
+}
+
+func TestLogWare(t *testing.T) {
+	// setup
+	b := new(bytes.Buffer)
+	r := httptest.NewRequest("GET", "/", nil)
+	w := httptest.NewRecorder()
+	log.SetFlags(0)
+	log.SetOutput(b)
+
+	// success
+	LogWare(http.HandlerFunc(mockHandler)).ServeHTTP(w, r)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "body", w.Body.String())
+
+	// confirm - logs
+	assert.Regexp(t, `192\.0\.2\.1:1234 GET \/ :: 200 4 0\.\d{5}`, b.String())
 }

@@ -120,12 +120,12 @@ func PathValue(r *http.Request, name string) string {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 // Write writes a formatted text/plain string to a ResponseWriter.
-func Write(w http.ResponseWriter, code int, text string, elems ...any) {
+func Write(w http.ResponseWriter, code int, body string, elems ...any) {
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
-	fmt.Fprintf(w, text, elems...)
+	fmt.Fprintf(w, body, elems...)
 }
 
 // WriteCode writes a text/plain error code to a ResponseWriter.
@@ -135,9 +135,9 @@ func WriteCode(w http.ResponseWriter, code int) {
 }
 
 // WriteError writes a formatted text/plain error string to a ResponseWriter.
-func WriteError(w http.ResponseWriter, code int, text string, elems ...any) {
-	text = fmt.Sprintf(text, elems...)
-	Write(w, code, "error %d: %s", code, text)
+func WriteError(w http.ResponseWriter, code int, body string, elems ...any) {
+	body = fmt.Sprintf(body, elems...)
+	Write(w, code, "error %d: %s", code, body)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -155,6 +155,49 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Write(w, http.StatusOK, Index)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//                        part five · http middleware functions                       //
+////////////////////////////////////////////////////////////////////////////////////////
+
+// ApplyWare applies all middleware to a HandlerFunc.
+func ApplyWare(next http.HandlerFunc) http.Handler {
+	return LogWare(next)
+}
+
+// logWriter is a custom ResponseWriter for logging middleware.
+type logWriter struct {
+	http.ResponseWriter
+	Code int
+	Size int
+}
+
+// WriteHeader writes and records a status code.
+func (w *logWriter) WriteHeader(code int) {
+	w.Code = code
+	w.ResponseWriter.WriteHeader(code)
+}
+
+// Write writes and records a byte slice.
+func (w *logWriter) Write(bytes []byte) (int, error) {
+	n, err := w.ResponseWriter.Write(bytes)
+	w.Size += n
+	return n, err
+}
+
+// LogWare is a middleware that logs an outgoing HTTP response.
+func LogWare(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		init := time.Now()
+		wrap := &logWriter{ResponseWriter: w, Code: http.StatusOK, Size: 0}
+		next.ServeHTTP(wrap, r)
+		secs := time.Since(init).Seconds()
+		log.Printf(
+			"%s %s %s :: %d %d %1.5f",
+			r.RemoteAddr, r.Method, r.URL.Path, wrap.Code, wrap.Size, secs,
+		)
+	})
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
