@@ -282,6 +282,26 @@ func PostSetPair(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var okay int
+	err = DB.Get(&okay, `select count(*) from Pairs where user=? and name=?`, user, name)
+	if err != nil {
+		WriteCode(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if okay == 0 {
+		var size int
+		if err = DB.Get(&size, `select count(*) from Pairs where user=?`, user); err != nil {
+			WriteCode(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		if size >= *FlagUser {
+			WriteError(w, http.StatusForbidden, "pair limit exceeded")
+			return
+		}
+	}
+
 	if _, err = DB.Exec(upsertPair, user, name, body); err != nil {
 		WriteCode(w, http.StatusInternalServerError, err)
 		return

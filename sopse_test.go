@@ -276,6 +276,49 @@ func TestPostSetPair(t *testing.T) {
 	assert.Equal(t, "error 404: user nope not found", w.Body.String())
 }
 
+func TestPostSetPairLimit(t *testing.T) {
+	// setup
+	*FlagUser = 2
+	*FlagSize = 999
+	mockDB()
+
+	// setup - create third pair (mockuser already has 2 pairs from mockData)
+	b := bytes.NewBufferString("body3")
+	r := httptest.NewRequest("POST", "/mockuser/mockpair3", b)
+	w := httptest.NewRecorder()
+	r.SetPathValue("uuid", "mockuser")
+	r.SetPathValue("name", "mockpair3")
+
+	// failure - pair limit exceeded
+	PostSetPair(w, r)
+	assert.Equal(t, http.StatusForbidden, w.Code)
+	assert.Equal(t, "error 403: pair limit exceeded", w.Body.String())
+
+	// confirm - pair was not created in database
+	var count int
+	err := DB.Get(&count, "select count(*) from Pairs where user=1 and name='mockpair3'")
+	assert.Equal(t, 0, count)
+	assert.NoError(t, err)
+
+	// setup - update existing pair should still work
+	b = bytes.NewBufferString("updated")
+	r = httptest.NewRequest("POST", "/mockuser/mockpair", b)
+	w = httptest.NewRecorder()
+	r.SetPathValue("uuid", "mockuser")
+	r.SetPathValue("name", "mockpair")
+
+	// success - updating existing pair works even at limit
+	PostSetPair(w, r)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "ok", w.Body.String())
+
+	// confirm - pair was updated in database
+	var body string
+	err = DB.Get(&body, "select body from Pairs where user=1 and name='mockpair'")
+	assert.Equal(t, "updated", body)
+	assert.NoError(t, err)
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //                        part five · http middleware functions                       //
 ////////////////////////////////////////////////////////////////////////////////////////
