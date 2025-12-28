@@ -162,20 +162,20 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user int
-	if err := DB.Get(&user, "select count(*) from Users"); err != nil {
+	var ulen int
+	if err := DB.Get(&ulen, "select count(*) from Users"); err != nil {
 		WriteCode(w, http.StatusInternalServerError)
 		return
 	}
 
-	var pair int
-	if err := DB.Get(&pair, "select count(*) from Pairs"); err != nil {
+	var plen int
+	if err := DB.Get(&plen, "select count(*) from Pairs"); err != nil {
 		WriteCode(w, http.StatusInternalServerError)
 		return
 	}
 
 	dura := time.Since(Uptime).Round(1 * time.Second).String()
-	Write(w, http.StatusOK, Index, dura, user, pair)
+	Write(w, http.StatusOK, Index, dura, ulen, plen)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -222,8 +222,15 @@ func LogWare(next http.Handler) http.Handler {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//                              part ??? · main function                              //
+//                              part six · main function                              //
 ////////////////////////////////////////////////////////////////////////////////////////
+
+// try logs a non-nil error.
+func try(err error) {
+	if err != nil {
+		log.Print(err)
+	}
+}
 
 // main runs the main Sopse program.
 func main() {
@@ -234,12 +241,14 @@ func main() {
 	log.Printf("connecting database on %s...", *FlagPath)
 	DB = sqlx.MustConnect("sqlite3", *FlagPath)
 	DB.MustExec(Pragma + Schema)
+	DB.SetMaxIdleConns(1)
+	DB.SetMaxOpenConns(1)
 
-	// Initialise ServeMux and handlers.
+	// Initialise multiplexer and handlers.
 	smux := http.NewServeMux()
 	smux.Handle("GET /", ApplyWare(GetIndex))
 
-	// Initialise Server.
+	// Initialise server.
 	serv := &http.Server{
 		Addr:           *FlagAddr,
 		Handler:        smux,
@@ -249,10 +258,11 @@ func main() {
 		WriteTimeout:   10 * time.Second,
 	}
 
-	// Start Server.
-	defer serv.Close()
+	// Start server.
 	log.Printf("starting Sopse on %s...", *FlagAddr)
-	if err := serv.ListenAndServe(); err != nil {
-		log.Fatal(err)
-	}
+	try(serv.ListenAndServe())
+
+	// Close database and server.
+	try(DB.Close())
+	try(serv.Close())
 }

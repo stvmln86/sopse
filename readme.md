@@ -23,8 +23,8 @@ Name       | Description                | Default
 ---------- | -------------------------- | -------
 `-addr`    | The address to serve on.   | `"127.0.0.1:8000"`
 `-path`    | The database path to use.  | `"./sopse.db"`
-`-bodyMax` | Maximum pair body size.    | `4096`
-`-nameMax` | Maximum pair name size     | `64`
+
+*TODO:* Add remaining flags.
 
 ## Contributing
 
