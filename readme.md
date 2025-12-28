@@ -15,17 +15,6 @@ go install github.com/stvmln86/sopse@latest
 
 ...or download the [latest binary release][re] for your platform.
 
-## Configuration
-
-Sopse is configured entirely through command-line flags. 
-
-Name       | Description                | Default 
----------- | -------------------------- | -------
-`-addr`    | The address to serve on.   | `"127.0.0.1:8000"`
-`-path`    | The database path to use.  | `"./sopse.db"`
-
-*TODO:* Add remaining flags.
-
 ## Contributing
 
 Please submit all bug reports and feature requests to the [issue tracker][is], thank you.
