@@ -79,6 +79,15 @@ const Schema = `
 	create index if not exists PairNames on Pairs(user, name);
 `
 
+// SQLite query constants.
+const (
+	insertUser  = `insert into Users (addr) values (?) returning uuid`
+	selectStats = `select
+		(select count(*) from Users) as users,
+		(select count(*) from Pairs) as pairs;
+	`
+)
+
 // 1.4 · index page template
 /////////////////////////////
 
@@ -168,12 +177,7 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 		Pairs int `db:"pairs"`
 	}
 
-	err := DB.Get(&stats, `select
-		(select count(*) from Users) as users,
-        (select count(*) from Pairs) as pairs;
-	`)
-
-	if err != nil {
+	if err := DB.Get(&stats, selectStats); err != nil {
 		WriteCode(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -185,23 +189,10 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 // 4.2 · post handlers
 ///////////////////////
 
-// PostNew creates and returns a new user UUID.
-func PostNew(w http.ResponseWriter, r *http.Request) {
-	addr := Addr(r)
-	rslt, err := DB.Exec("insert into Users (addr) values (?)", addr)
-	if err != nil {
-		WriteCode(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	last, err := rslt.LastInsertId()
-	if err != nil {
-		WriteCode(w, http.StatusInternalServerError, err)
-		return
-	}
-
+// PostCreateUser creates and returns a new user UUID.
+func PostCreateUser(w http.ResponseWriter, r *http.Request) {
 	var uuid string
-	if err := DB.Get(&uuid, "select uuid from Users where id=?", last); err != nil {
+	if err := DB.Get(&uuid, insertUser, Addr(r)); err != nil {
 		WriteCode(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -277,7 +268,7 @@ func main() {
 
 	// Initialise multiplexer and handlers.
 	smux := http.NewServeMux()
-	smux.Handle("POST /new", ApplyWare(PostNew))
+	smux.Handle("POST /new", ApplyWare(PostCreateUser))
 	smux.Handle("GET /", ApplyWare(GetIndex))
 
 	// Initialise server.

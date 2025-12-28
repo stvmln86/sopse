@@ -172,14 +172,14 @@ func TestGetIndex(t *testing.T) {
 // 4.2 · post handlers
 ///////////////////////
 
-func TestPostNew(t *testing.T) {
+func TestPostCreateUser(t *testing.T) {
 	// setup
 	r := httptest.NewRequest("POST", "/new", nil)
 	w := httptest.NewRecorder()
 	mockDB()
 
 	// success
-	PostNew(w, r)
+	PostCreateUser(w, r)
 	body := w.Body.String()
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Regexp(t, `[0-9a-f]{16}`, body)
