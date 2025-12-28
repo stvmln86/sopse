@@ -32,6 +32,15 @@ func (p *Pair) Check() bool {
 	return neat.Hash(p.Body) == p.Hash
 }
 
+// Clone returns a copy of the Pair.
+func (p *Pair) Clone() *Pair {
+	return &Pair{
+		Body: p.Body,
+		Hash: p.Hash,
+		Init: p.Init,
+	}
+}
+
 // Expired returns true if the Pair's creation time is over a limit.
 func (p *Pair) Expired(secs int64) bool {
 	return neat.Expired(p.Init, secs)

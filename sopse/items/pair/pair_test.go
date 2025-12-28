@@ -37,6 +37,14 @@ func TestCheck(t *testing.T) {
 	})
 }
 
+func TestClone(t *testing.T) {
+	pair := New("body")
+	clne := pair.Clone()
+	assert.Equal(t, pair.Body, clne.Body)
+	assert.Equal(t, pair.Hash, clne.Hash)
+	assert.Equal(t, pair.Init, clne.Init)
+}
+
 func TestExpired(t *testing.T) {
 	init := time.Now().Add(-100 * time.Second).Unix()
 	pair := &Pair{"", "", init}
