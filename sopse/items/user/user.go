@@ -76,20 +76,28 @@ func (u *User) Exists() bool {
 	return file.Exists(u.Orig)
 }
 
-// GetPair returns an existing Pair from the User.
+// GetPair returns a copy of an existing Pair from the User.
 func (u *User) GetPair(name string) (*pair.Pair, bool) {
 	u.mutex.RLock()
 	defer u.mutex.RUnlock()
 	pair, okay := u.Pairs[name]
-	return pair, okay
+	return pair.Clone(), okay
+}
+
+// GetPairBody returns the body of an existing Pair from the User.
+func (u *User) GetPairBody(name string) (string, bool) {
+	u.mutex.RLock()
+	defer u.mutex.RUnlock()
+	pair, okay := u.Pairs[name]
+	return pair.Body, okay
 }
 
 // SetPair sets a new or existing Pair into the User.
-func (u *User) SetPair(name, body string) (*pair.Pair, error) {
+func (u *User) SetPair(name string, pair *pair.Pair) error {
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
-	u.Pairs[name] = pair.New(body)
-	return u.Pairs[name], file.Update(u.Orig, u)
+	u.Pairs[name] = pair
+	return file.Update(u.Orig, u)
 }
 
 // Update updates the User's file.
