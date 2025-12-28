@@ -2,27 +2,21 @@
 package neat
 
 import (
-	"crypto/sha256"
-	"encoding/base64"
+	"strconv"
 	"time"
 )
 
-// Expired returns true if a Unix UTC integer is over a limit.
-func Expired(unix, secs int64) bool {
-	return time.Now().Unix() > unix+secs
+// Expired returns true if a Time object is past a duration.
+func Expired(tobj time.Time, dura time.Duration) bool {
+	return time.Now().After(tobj.Add(dura))
 }
 
-// Hash returns a base64-encoded SHA256 hash from joined strings.
-func Hash(elems ...string) string {
-	hash := sha256.New()
-	for _, elem := range elems {
-		hash.Write([]byte(elem))
+// Time returns a local Time object from a Unix UTC string.
+func Time(unix string) time.Time {
+	uint, err := strconv.ParseInt(unix, 10, 64)
+	if err != nil {
+		return time.Unix(0, 0).Local()
 	}
 
-	return base64.RawURLEncoding.EncodeToString(hash.Sum(nil))
-}
-
-// Time returns a local Time object from a Unix UTC integer.
-func Time(unix int64) time.Time {
-	return time.Unix(unix, 0).Local()
+	return time.Unix(uint, 0).Local()
 }

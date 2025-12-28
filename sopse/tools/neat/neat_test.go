@@ -8,26 +8,28 @@ import (
 )
 
 func TestExpired(t *testing.T) {
-	unix := time.Now().Add(-100 * time.Second).Unix()
+	// setup
+	tobj := time.Now().Add(-1 * time.Minute)
 
-	t.Run("fresh", func(t *testing.T) {
-		okay := Expired(unix, 200)
-		assert.False(t, okay)
-	})
+	// success - true
+	okay := Expired(tobj, 30*time.Second)
+	assert.True(t, okay)
 
-	t.Run("stale", func(t *testing.T) {
-		okay := Expired(unix, 99)
-		assert.True(t, okay)
-	})
-}
-
-func TestHash(t *testing.T) {
-	hash := Hash("a", "b", "c")
-	assert.Equal(t, "ungWv48Bz-pBQUDeXa4iI7ADYaOWF3qctBD_YfIAFa0", hash)
+	// success - false
+	okay = Expired(tobj, 2*time.Minute)
+	assert.False(t, okay)
 }
 
 func TestTime(t *testing.T) {
+	// setup
 	want := time.Unix(100, 0).Local()
-	tobj := Time(100)
+	fail := time.Unix(0, 0).Local()
+
+	// success - valid time
+	tobj := Time("100")
 	assert.Equal(t, want, tobj)
+
+	// failure - invalid time
+	tobj = Time("")
+	assert.Equal(t, fail, tobj)
 }
