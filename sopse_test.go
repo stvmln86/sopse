@@ -25,7 +25,8 @@ import (
 // mockData is mock database data for unit testing.
 const mockData = `
 	insert into Users (uuid, addr) values ('mockuser', '192.0.2.1');
-	insert into Pairs (user, name, body) values (1, 'mockpair', 'body');
+	insert into Pairs (user, name, body) values (1, 'mockpair',  'body');
+	insert into Pairs (user, name, body) values (1, 'mockpair2', 'body');
 `
 
 // mockDB initialises DB as an in-memory database populated with mockData.
@@ -195,6 +196,29 @@ func TestGetPair(t *testing.T) {
 	GetPair(w, r)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 	assert.Equal(t, "error 404: pair nope/nope not found", w.Body.String())
+}
+
+func TestGetUser(t *testing.T) {
+	// setup
+	r := httptest.NewRequest("GET", "/mockuser", nil)
+	w := httptest.NewRecorder()
+	r.SetPathValue("uuid", "mockuser")
+	mockDB()
+
+	// success
+	GetUser(w, r)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "mockpair\nmockpair2", w.Body.String())
+
+	// setup
+	r = httptest.NewRequest("GET", "/nope", nil)
+	w = httptest.NewRecorder()
+	r.SetPathValue("uuid", "nope")
+
+	// failure - user not found
+	GetUser(w, r)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, "error 404: user nope not found", w.Body.String())
 }
 
 // 4.2 · post handlers
