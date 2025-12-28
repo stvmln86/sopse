@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-// Create creates a new JSON file.
+// Create creates a new file containing a marshalled JSON value.
 func Create(dest string, data any) error {
 	bytes, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
@@ -53,7 +53,7 @@ func Read(orig string, data any) error {
 	return nil
 }
 
-// Update overwrites a JSON file with a marshalled object.
+// Update overwrites a file with a marshalled JSON value.
 func Update(orig string, data any) error {
 	bytes, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
