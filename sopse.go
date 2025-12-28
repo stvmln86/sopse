@@ -93,7 +93,7 @@ const Index = `
 stephen's obsessive pair storage engine, version v0.0.0:
 - system uptime: %s
 - current stats: %d users, %d pairs
-- github repo: github.com/stvmln86/sopse
+- github source: https://github.com/stvmln86/sopse
 `
 
 ////////////////////////////////////////////////////////////////////////////////////////
