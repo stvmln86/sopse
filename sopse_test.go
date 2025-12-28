@@ -116,3 +116,27 @@ func TestWriteError(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	assert.Equal(t, "error 400: body", w.Body.String())
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+//                         part four · http handler functions                         //
+////////////////////////////////////////////////////////////////////////////////////////
+
+func TestGetIndex(t *testing.T) {
+	// setup
+	r := httptest.NewRequest("GET", "/", nil)
+	w := httptest.NewRecorder()
+
+	// success
+	GetIndex(w, r)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, Index, w.Body.String())
+
+	// setup
+	r = httptest.NewRequest("GET", "/nope", nil)
+	w = httptest.NewRecorder()
+
+	// failure - 404 error
+	GetIndex(w, r)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, "error 404: path /nope not found", w.Body.String())
+}

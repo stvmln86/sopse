@@ -76,6 +76,18 @@ const Schema = `
 	create index if not exists PairNames on Pairs(user, name);
 `
 
+// 1.4 · index page template
+/////////////////////////////
+
+// Index is the static index page template.
+const Index = `
+ ▄██▀█ ▄███▄ ████▄ ▄██▀█ ▄█▀█▄
+ ▀███▄ ██ ██ ██ ██ ▀███▄ ██▄█▀
+█▄▄██▀▄▀███▀▄████▀█▄▄██▀▄▀█▄▄▄
+             ██
+             ▀
+`
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //                        part two · data processing functions                        //
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -126,6 +138,23 @@ func WriteCode(w http.ResponseWriter, code int) {
 func WriteError(w http.ResponseWriter, code int, text string, elems ...any) {
 	text = fmt.Sprintf(text, elems...)
 	Write(w, code, "error %d: %s", code, text)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//                         part four · http handler functions                         //
+////////////////////////////////////////////////////////////////////////////////////////
+
+// 4.1 · get handlers
+//////////////////////
+
+// GetIndex returns the index page or a 404 error.
+func GetIndex(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		WriteError(w, http.StatusNotFound, "path %s not found", r.URL.Path)
+		return
+	}
+
+	Write(w, http.StatusOK, Index)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
