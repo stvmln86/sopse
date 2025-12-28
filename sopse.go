@@ -136,8 +136,9 @@ func Write(w http.ResponseWriter, code int, body string, elems ...any) {
 	fmt.Fprintf(w, body, elems...)
 }
 
-// WriteCode writes a text/plain error code to a ResponseWriter.
-func WriteCode(w http.ResponseWriter, code int) {
+// WriteCode writes a text/plain error code to a ResponseWriter and logs an error.
+func WriteCode(w http.ResponseWriter, code int, err error) {
+	log.Print(err)
 	stat := http.StatusText(code)
 	Write(w, code, "error %d: %s", code, strings.ToLower(stat))
 }
@@ -173,7 +174,7 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 	`)
 
 	if err != nil {
-		WriteCode(w, http.StatusInternalServerError)
+		WriteCode(w, http.StatusInternalServerError, err)
 		return
 	}
 

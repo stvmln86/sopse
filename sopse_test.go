@@ -6,6 +6,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -116,12 +117,18 @@ func TestWrite(t *testing.T) {
 
 func TestWriteCode(t *testing.T) {
 	// setup
+	b := new(bytes.Buffer)
 	w := httptest.NewRecorder()
+	log.SetFlags(0)
+	log.SetOutput(b)
 
 	// success
-	WriteCode(w, http.StatusInternalServerError)
+	WriteCode(w, http.StatusInternalServerError, errors.New("error"))
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 	assert.Equal(t, "error 500: internal server error", w.Body.String())
+
+	// confirm - logs
+	assert.Equal(t, "error\n", b.String())
 }
 
 func TestWriteError(t *testing.T) {
