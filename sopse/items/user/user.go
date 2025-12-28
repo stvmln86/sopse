@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stvmln86/sopse/sopse/items/pair"
+	"github.com/stvmln86/sopse/sopse/tools/file"
 	"github.com/stvmln86/sopse/sopse/tools/neat"
 )
 
@@ -81,7 +82,11 @@ func (u *User) GetPair(name string) (*pair.Pair, bool) {
 	u.mutex.RLock()
 	defer u.mutex.RUnlock()
 	pair, okay := u.Pairs[name]
-	return pair.Clone(), okay
+	if !okay {
+		return nil, false
+	}
+
+	return pair.Clone(), true
 }
 
 // GetPairBody returns the body of an existing Pair from the User.
