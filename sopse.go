@@ -182,6 +182,33 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 	Write(w, http.StatusOK, Index, dura, stats.Users, stats.Pairs)
 }
 
+// 4.2 · post handlers
+///////////////////////
+
+// PostNew creates and returns a new user UUID.
+func PostNew(w http.ResponseWriter, r *http.Request) {
+	addr := Addr(r)
+	rslt, err := DB.Exec("insert into Users (addr) values (?)", addr)
+	if err != nil {
+		WriteCode(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	last, err := rslt.LastInsertId()
+	if err != nil {
+		WriteCode(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	var uuid string
+	if err := DB.Get(&uuid, "select uuid from Users where id=?", last); err != nil {
+		WriteCode(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	Write(w, http.StatusCreated, "%s", uuid)
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //                        part five · http middleware functions                       //
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -250,6 +277,7 @@ func main() {
 
 	// Initialise multiplexer and handlers.
 	smux := http.NewServeMux()
+	smux.Handle("POST /new", ApplyWare(PostNew))
 	smux.Handle("GET /", ApplyWare(GetIndex))
 
 	// Initialise server.

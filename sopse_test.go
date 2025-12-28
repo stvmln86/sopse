@@ -145,6 +145,9 @@ func TestWriteError(t *testing.T) {
 //                         part four · http handler functions                         //
 ////////////////////////////////////////////////////////////////////////////////////////
 
+// 4.1 · get handlers
+//////////////////////
+
 func TestGetIndex(t *testing.T) {
 	// setup
 	r := httptest.NewRequest("GET", "/", nil)
@@ -164,6 +167,28 @@ func TestGetIndex(t *testing.T) {
 	GetIndex(w, r)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 	assert.Equal(t, "error 404: path /nope not found", w.Body.String())
+}
+
+// 4.2 · post handlers
+///////////////////////
+
+func TestPostNew(t *testing.T) {
+	// setup
+	r := httptest.NewRequest("POST", "/new", nil)
+	w := httptest.NewRecorder()
+	mockDB()
+
+	// success
+	PostNew(w, r)
+	body := w.Body.String()
+	assert.Equal(t, http.StatusCreated, w.Code)
+	assert.Regexp(t, `[0-9a-f]{16}`, body)
+
+	// confirm - database
+	var addr string
+	err := DB.Get(&addr, "select addr from Users where uuid=?", body)
+	assert.Equal(t, "192.0.2.1", addr)
+	assert.NoError(t, err)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
