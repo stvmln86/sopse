@@ -20,6 +20,15 @@ import (
 //                          part zero · test data and helpers                         //
 ////////////////////////////////////////////////////////////////////////////////////////
 
+// mockData is mock database data for unit testing.
+const mockData = ``
+
+// mockDB initialises DB as an in-memory database populated with mockData.
+func mockDB() {
+	DB = sqlx.MustConnect("sqlite3", ":memory:")
+	DB.MustExec(Pragma + Schema + mockData)
+}
+
 // mockHandler is a mock HandlerFunc for middleware testing.
 func mockHandler(w http.ResponseWriter, _ *http.Request) {
 	fmt.Fprint(w, "body")
@@ -132,11 +141,12 @@ func TestGetIndex(t *testing.T) {
 	// setup
 	r := httptest.NewRequest("GET", "/", nil)
 	w := httptest.NewRecorder()
+	mockDB()
 
 	// success
 	GetIndex(w, r)
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, Index, w.Body.String())
+	assert.NotEmpty(t, w.Body.String())
 
 	// setup
 	r = httptest.NewRequest("GET", "/nope", nil)

@@ -28,6 +28,9 @@ import (
 // DB is the global database connection object.
 var DB *sqlx.DB
 
+// Uptime is the system start time.
+var Uptime = time.Now()
+
 // 1.2 · configuration flags
 /////////////////////////////
 
@@ -86,6 +89,11 @@ const Index = `
 █▄▄██▀▄▀███▀▄████▀█▄▄██▀▄▀█▄▄▄
              ██
              ▀
+
+stephen's obsessive pair storage engine, version v0.0.0:
+- system uptime: %s
+- current stats: %d users, %d pairs
+- github repo: github.com/stvmln86/sopse
 `
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -154,7 +162,20 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Write(w, http.StatusOK, Index)
+	var user int
+	if err := DB.Get(&user, "select count(*) from Users"); err != nil {
+		WriteCode(w, http.StatusInternalServerError)
+		return
+	}
+
+	var pair int
+	if err := DB.Get(&pair, "select count(*) from Pairs"); err != nil {
+		WriteCode(w, http.StatusInternalServerError)
+		return
+	}
+
+	dura := time.Since(Uptime).Round(1 * time.Second).String()
+	Write(w, http.StatusOK, Index, dura, user, pair)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -210,11 +231,13 @@ func main() {
 	flag.Parse()
 
 	// Initialise database.
+	log.Printf("connecting database on %s...", *FlagPath)
 	DB = sqlx.MustConnect("sqlite3", *FlagPath)
 	DB.MustExec(Pragma + Schema)
 
 	// Initialise ServeMux and handlers.
 	smux := http.NewServeMux()
+	smux.Handle("GET /", ApplyWare(GetIndex))
 
 	// Initialise Server.
 	serv := &http.Server{
@@ -228,6 +251,7 @@ func main() {
 
 	// Start Server.
 	defer serv.Close()
+	log.Printf("starting Sopse on %s...", *FlagAddr)
 	if err := serv.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
