@@ -23,7 +23,7 @@ func TestExpired(t *testing.T) {
 	assert.False(t, okay)
 }
 
-func TestFrom(t *testing.T) {
+func TestAddr(t *testing.T) {
 	// setup
 	r := httptest.NewRequest("GET", "/", nil)
 
