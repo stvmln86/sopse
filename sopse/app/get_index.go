@@ -24,7 +24,7 @@ stephen's obsessive pair storage engine, version v0.0.0:
 // Uptime is the system start time.
 var Uptime = time.Now()
 
-// GetIndexOr404 returns the index page or a 404 error.
+// GetIndexOr404 returns the index page or a Not Found error.
 func (a *App) GetIndexOr404(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		prot.WriteError(w, http.StatusNotFound)
