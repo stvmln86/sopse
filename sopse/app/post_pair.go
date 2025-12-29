@@ -7,7 +7,7 @@ import (
 	"github.com/stvmln86/sopse/sopse/tools/prot"
 )
 
-// PostPair sets a new or existing User Pair.
+// PostPair sets a new or existing Pair for an existing User.
 func (a *App) PostPair(w http.ResponseWriter, r *http.Request) {
 	uuid := r.PathValue("uuid")
 	user, err := user.Get(a.DB, uuid)

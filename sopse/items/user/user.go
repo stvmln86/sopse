@@ -2,6 +2,7 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -66,15 +67,27 @@ func (u *User) GetPair(name string) (*pair.Pair, error) {
 	return pair.Get(u.DB, u.UUID(), name)
 }
 
-// ListPairs returns the User's existing Pair paths.
-func (u *User) ListPairs() ([]string, error) {
+// ListPairs returns the User's existing Pairs.
+func (u *User) ListPairs() ([]*pair.Pair, error) {
 	pref := bolt.Join("pair", u.UUID())
 	paths, err := bolt.List(u.DB, pref)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list User %q - %w", u.Path, err)
 	}
 
-	return paths, nil
+	var pairs []*pair.Pair
+	for _, path := range paths {
+		_, uuid, name := bolt.Split(path)
+		pair, err := pair.Get(u.DB, uuid, name)
+		if err != nil {
+			sub := errors.Unwrap(err)
+			return nil, fmt.Errorf("cannot list User %q - %w", u.Path, sub)
+		}
+
+		pairs = append(pairs, pair)
+	}
+
+	return pairs, nil
 }
 
 // Map returns the User as a map.

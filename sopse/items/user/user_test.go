@@ -90,11 +90,10 @@ func TestListPairs(t *testing.T) {
 	user := mockUser(t)
 
 	// success
-	paths, err := user.ListPairs()
-	assert.Equal(t, []string{
-		"pair.mockUser1.alpha",
-		"pair.mockUser1.bravo",
-	}, paths)
+	pairs, err := user.ListPairs()
+	assert.Len(t, pairs, 2)
+	assert.Equal(t, "pair.mockUser1.alpha", pairs[0].Path)
+	assert.Equal(t, "pair.mockUser1.bravo", pairs[1].Path)
 	assert.NoError(t, err)
 }
 
