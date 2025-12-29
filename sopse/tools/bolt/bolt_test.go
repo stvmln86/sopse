@@ -60,6 +60,28 @@ func TestGet(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestJoin(t *testing.T) {
+	// success - two elements
+	name := Join("head", "kind")
+	assert.Equal(t, "head.kind", name)
+
+	// success - three elements
+	name = Join("head", "kind", "elem")
+	assert.Equal(t, "head.kind.elem", name)
+}
+
+func TestList(t *testing.T) {
+	// setup
+	db := test.DB(t, false)
+	test.Set(t, db, "name1", "attr", "data")
+	test.Set(t, db, "name2", "attr", "data")
+
+	// success
+	names, err := List(db, "name")
+	assert.Equal(t, []string{"name1", "name2"}, names)
+	assert.NoError(t, err)
+}
+
 func TestSet(t *testing.T) {
 	// setup
 	db := test.DB(t, false)

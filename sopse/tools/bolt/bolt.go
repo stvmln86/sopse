@@ -2,6 +2,7 @@
 package bolt
 
 import (
+	"strings"
 	"time"
 
 	"go.etcd.io/bbolt"
@@ -39,6 +40,23 @@ func Get(db *bbolt.DB, name, attr string) (string, error) {
 		}
 
 		return nil
+	})
+}
+
+// Join returns a database entry name from a kind and one or more elements.
+func Join(kind, head string, elems ...string) string {
+	elems = append([]string{kind, head}, elems...)
+	return strings.Join(elems, ".")
+}
+
+// List returns existing database entry names containing a prefix.
+func List(db *bbolt.DB, pref string) ([]string, error) {
+	var names []string
+	return names, db.View(func(tx *bbolt.Tx) error {
+		return tx.ForEach(func(name []byte, _ *bbolt.Bucket) error {
+			names = append(names, string(name))
+			return nil
+		})
 	})
 }
 
