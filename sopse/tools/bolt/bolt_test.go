@@ -68,8 +68,8 @@ func TestGet(t *testing.T) {
 
 func TestJoin(t *testing.T) {
 	// success
-	addr := Join("user", "mockUser1")
-	assert.Equal(t, "user.mockUser1", addr)
+	path := Join("user", "mockUser1")
+	assert.Equal(t, "user.mockUser1", path)
 }
 
 func TestList(t *testing.T) {
@@ -77,11 +77,11 @@ func TestList(t *testing.T) {
 	db := test.DB(t)
 
 	// success
-	addrs, err := List(db, "pair.mockUser1")
+	paths, err := List(db, "pair.mockUser1")
 	assert.Equal(t, []string{
 		"pair.mockUser1.alpha",
 		"pair.mockUser1.bravo",
-	}, addrs)
+	}, paths)
 	assert.NoError(t, err)
 }
 
@@ -90,12 +90,12 @@ func TestSet(t *testing.T) {
 	db := test.DB(t)
 
 	// success
-	err := Set(db, "addr", map[string]string{"attr": "data"})
+	err := Set(db, "path", map[string]string{"attr": "data"})
 	assert.NoError(t, err)
 
 	// confirm - database
 	test.Try(t, db.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte("addr"))
+		buck := tx.Bucket([]byte("path"))
 		data := string(buck.Get([]byte("attr")))
 		assert.Equal(t, "data", data)
 		return nil

@@ -14,37 +14,37 @@ import (
 // Pair is a single recorded key-value pair.
 type Pair struct {
 	DB   *bbolt.DB
-	Addr string
+	Path string
 	Body string
 	Init time.Time
 }
 
 // New returns a new Pair.
-func New(db *bbolt.DB, addr, body string, init time.Time) *Pair {
-	return &Pair{db, addr, body, init}
+func New(db *bbolt.DB, path, body string, init time.Time) *Pair {
+	return &Pair{db, path, body, init}
 }
 
 // Get returns an existing Pair or nil.
 func Get(db *bbolt.DB, uuid, name string) (*Pair, error) {
-	addr := bolt.Join("pair", uuid, name)
-	bmap, err := bolt.Get(db, addr)
+	path := bolt.Join("pair", uuid, name)
+	bmap, err := bolt.Get(db, path)
 	switch {
 	case bmap == nil:
 		return nil, nil
 	case err != nil:
-		return nil, fmt.Errorf("cannot get Pair %q - %w", addr, err)
+		return nil, fmt.Errorf("cannot get Pair %q - %w", path, err)
 	}
 
 	init := neat.Time(bmap["init"])
-	return New(db, addr, bmap["body"], init), nil
+	return New(db, path, bmap["body"], init), nil
 }
 
 // Set sets and returns a new or existing Pair.
 func Set(db *bbolt.DB, uuid, name, body string) (*Pair, error) {
-	addr := bolt.Join("pair", uuid, name)
-	pair := New(db, addr, body, time.Now())
-	if err := bolt.Set(db, addr, pair.Map()); err != nil {
-		return nil, fmt.Errorf("cannot set Pair %q - %w", addr, err)
+	path := bolt.Join("pair", uuid, name)
+	pair := New(db, path, body, time.Now())
+	if err := bolt.Set(db, path, pair.Map()); err != nil {
+		return nil, fmt.Errorf("cannot set Pair %q - %w", path, err)
 	}
 
 	return pair, nil
@@ -52,8 +52,8 @@ func Set(db *bbolt.DB, uuid, name, body string) (*Pair, error) {
 
 // Delete deletes the Pair.
 func (p *Pair) Delete() error {
-	if err := bolt.Delete(p.DB, p.Addr); err != nil {
-		return fmt.Errorf("cannot delete Pair %q - %w", p.Addr, err)
+	if err := bolt.Delete(p.DB, p.Path); err != nil {
+		return fmt.Errorf("cannot delete Pair %q - %w", p.Path, err)
 	}
 
 	return nil
@@ -74,15 +74,15 @@ func (p *Pair) Map() map[string]string {
 
 // Name returns the Pair's base name.
 func (p *Pair) Name() string {
-	elems := strings.Split(p.Addr, ".")
+	elems := strings.Split(p.Path, ".")
 	return elems[len(elems)-1]
 }
 
 // Update overwrites the Pair with a new body.
 func (p *Pair) Update(body string) error {
 	p.Body = body
-	if err := bolt.Set(p.DB, p.Addr, p.Map()); err != nil {
-		return fmt.Errorf("cannot update Pair %q - %w", p.Addr, err)
+	if err := bolt.Set(p.DB, p.Path, p.Map()); err != nil {
+		return fmt.Errorf("cannot update Pair %q - %w", p.Path, err)
 	}
 
 	return nil

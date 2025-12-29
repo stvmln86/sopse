@@ -26,8 +26,8 @@ func TestNew(t *testing.T) {
 	// success
 	user := New(db, "user.mockUser1", "1.1.1.1", mockTime)
 	assert.Equal(t, db, user.DB)
-	assert.Equal(t, "user.mockUser1", user.Addr)
-	assert.Equal(t, "1.1.1.1", user.From)
+	assert.Equal(t, "user.mockUser1", user.Path)
+	assert.Equal(t, "1.1.1.1", user.Addr)
 	assert.Equal(t, mockTime, user.Init)
 }
 
@@ -39,14 +39,14 @@ func TestCreate(t *testing.T) {
 	// success
 	user, err := Create(db, r)
 	assert.Equal(t, db, user.DB)
-	assert.Regexp(t, `user\.[\w_-]{22}`, user.Addr)
-	assert.Equal(t, "192.0.2.1", user.From)
+	assert.Regexp(t, `user\.[\w_-]{22}`, user.Path)
+	assert.Equal(t, "192.0.2.1", user.Addr)
 	assert.WithinDuration(t, time.Now(), user.Init, 1*time.Second)
 	assert.NoError(t, err)
 
 	// confirm - database
 	test.Try(t, db.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte(user.Addr))
+		buck := tx.Bucket([]byte(user.Path))
 		for attr, want := range user.Map() {
 			data := string(buck.Get([]byte(attr)))
 			assert.Equal(t, want, data)
@@ -63,8 +63,8 @@ func TestGet(t *testing.T) {
 	// success
 	user, err := Get(db, "mockUser1")
 	assert.Equal(t, db, user.DB)
-	assert.Equal(t, "user.mockUser1", user.Addr)
-	assert.Equal(t, "1.1.1.1", user.From)
+	assert.Equal(t, "user.mockUser1", user.Path)
+	assert.Equal(t, "1.1.1.1", user.Addr)
 	assert.Equal(t, mockTime, user.Init)
 	assert.NoError(t, err)
 }
@@ -92,7 +92,7 @@ func TestGetPair(t *testing.T) {
 	// success
 	pair, err := user.GetPair("alpha")
 	assert.Equal(t, user.DB, pair.DB)
-	assert.Equal(t, "pair.mockUser1.alpha", pair.Addr)
+	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
 	assert.Equal(t, "Alpha.", pair.Body)
 	assert.Equal(t, mockTime, pair.Init)
 	assert.NoError(t, err)
@@ -103,11 +103,11 @@ func TestListPairs(t *testing.T) {
 	user := mockUser(t)
 
 	// success
-	addrs, err := user.ListPairs()
+	paths, err := user.ListPairs()
 	assert.Equal(t, []string{
 		"pair.mockUser1.alpha",
 		"pair.mockUser1.bravo",
-	}, addrs)
+	}, paths)
 	assert.NoError(t, err)
 }
 
@@ -118,7 +118,7 @@ func TestMap(t *testing.T) {
 	// success
 	bmap := user.Map()
 	assert.Equal(t, map[string]string{
-		"from": "1.1.1.1",
+		"addr": "1.1.1.1",
 		"init": "1000",
 	}, bmap)
 }
@@ -130,7 +130,7 @@ func TestSetPair(t *testing.T) {
 	// success
 	pair, err := user.SetPair("alpha", "body")
 	assert.Equal(t, user.DB, pair.DB)
-	assert.Equal(t, "pair.mockUser1.alpha", pair.Addr)
+	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
 	assert.Equal(t, "body", pair.Body)
 	assert.WithinDuration(t, time.Now(), pair.Init, 1*time.Second)
 	assert.NoError(t, err)

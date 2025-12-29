@@ -28,8 +28,8 @@ func TestFrom(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
 
 	// success
-	from := From(r)
-	assert.Equal(t, "192.0.2.1", from)
+	addr := Addr(r)
+	assert.Equal(t, "192.0.2.1", addr)
 }
 
 func TestTime(t *testing.T) {

@@ -16,8 +16,8 @@ func Expired(tobj time.Time, dura time.Duration) bool {
 	return time.Now().After(tobj.Add(dura))
 }
 
-// From returns the remote IP address from a Request.
-func From(r *http.Request) string {
+// Addr returns the remote IP address from a Request.
+func Addr(r *http.Request) string {
 	host, _, _ := net.SplitHostPort(r.RemoteAddr)
 	return host
 }

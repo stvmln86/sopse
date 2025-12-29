@@ -16,26 +16,26 @@ func Connect(path string) (*bbolt.DB, error) {
 }
 
 // Delete deletes an existing database entry.
-func Delete(db *bbolt.DB, addr string) error {
+func Delete(db *bbolt.DB, path string) error {
 	return db.Update(func(tx *bbolt.Tx) error {
-		return tx.DeleteBucket([]byte(addr))
+		return tx.DeleteBucket([]byte(path))
 	})
 }
 
 // Exists returns true if a database entry exists.
-func Exists(db *bbolt.DB, addr string) (bool, error) {
+func Exists(db *bbolt.DB, path string) (bool, error) {
 	var okay bool
 	return okay, db.View(func(tx *bbolt.Tx) error {
-		okay = tx.Bucket([]byte(addr)) != nil
+		okay = tx.Bucket([]byte(path)) != nil
 		return nil
 	})
 }
 
 // Get returns an existing database entry as a map.
-func Get(db *bbolt.DB, addr string) (map[string]string, error) {
+func Get(db *bbolt.DB, path string) (map[string]string, error) {
 	var bmap map[string]string
 	return bmap, db.View(func(tx *bbolt.Tx) error {
-		if buck := tx.Bucket([]byte(addr)); buck != nil {
+		if buck := tx.Bucket([]byte(path)); buck != nil {
 			bmap = make(map[string]string)
 			return buck.ForEach(func(attr, data []byte) error {
 				bmap[string(attr)] = string(data)
@@ -47,18 +47,18 @@ func Get(db *bbolt.DB, addr string) (map[string]string, error) {
 	})
 }
 
-// Join returns a database entry address from dot-joined elements.
+// Join returns a database entry path from dot-joined elements.
 func Join(elems ...string) string {
 	return strings.Join(elems, ".")
 }
 
-// List returns existing database entry addrs containing a prefix.
+// List returns existing database entry paths containing a prefix.
 func List(db *bbolt.DB, pref string) ([]string, error) {
-	var addrs []string
-	return addrs, db.View(func(tx *bbolt.Tx) error {
-		return tx.ForEach(func(addr []byte, _ *bbolt.Bucket) error {
-			if strings.HasPrefix(string(addr), pref) {
-				addrs = append(addrs, string(addr))
+	var paths []string
+	return paths, db.View(func(tx *bbolt.Tx) error {
+		return tx.ForEach(func(path []byte, _ *bbolt.Bucket) error {
+			if strings.HasPrefix(string(path), pref) {
+				paths = append(paths, string(path))
 			}
 
 			return nil
@@ -67,9 +67,9 @@ func List(db *bbolt.DB, pref string) ([]string, error) {
 }
 
 // Set sets a new or existing database entry from a map.
-func Set(db *bbolt.DB, addr string, bmap map[string]string) error {
+func Set(db *bbolt.DB, path string, bmap map[string]string) error {
 	return db.Update(func(tx *bbolt.Tx) error {
-		buck, err := tx.CreateBucketIfNotExists([]byte(addr))
+		buck, err := tx.CreateBucketIfNotExists([]byte(path))
 		if err != nil {
 			return err
 		}

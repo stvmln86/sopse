@@ -25,7 +25,7 @@ func TestNew(t *testing.T) {
 	// success
 	pair := New(db, "pair.mockUser1.alpha", "Alpha.", mockTime)
 	assert.Equal(t, db, pair.DB)
-	assert.Equal(t, "pair.mockUser1.alpha", pair.Addr)
+	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
 	assert.Equal(t, "Alpha.", pair.Body)
 	assert.Equal(t, mockTime, pair.Init)
 }
@@ -37,7 +37,7 @@ func TestGet(t *testing.T) {
 	// success
 	pair, err := Get(db, "mockUser1", "alpha")
 	assert.Equal(t, db, pair.DB)
-	assert.Equal(t, "pair.mockUser1.alpha", pair.Addr)
+	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
 	assert.Equal(t, "Alpha.", pair.Body)
 	assert.Equal(t, mockTime, pair.Init)
 	assert.NoError(t, err)
@@ -50,7 +50,7 @@ func TestSet(t *testing.T) {
 	// success
 	pair, err := Set(db, "mockUser1", "alpha", "body")
 	assert.Equal(t, db, pair.DB)
-	assert.Equal(t, "pair.mockUser1.alpha", pair.Addr)
+	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
 	assert.Equal(t, "body", pair.Body)
 	assert.WithinDuration(t, time.Now(), pair.Init, 1*time.Second)
 	assert.NoError(t, err)
