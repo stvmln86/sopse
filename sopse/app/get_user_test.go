@@ -9,7 +9,7 @@ import (
 
 func TestGetUser(t *testing.T) {
 	// success
-	_, w := mockRun(t, "GET", "/api/mockUser1", "")
+	_, w := mockRun(t, "GET", "/api/mockUser", "")
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "alpha\nbravo", w.Body.String())
 

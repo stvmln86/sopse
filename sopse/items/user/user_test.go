@@ -14,7 +14,7 @@ var mockTime = time.Unix(1000, 0).Local()
 
 func mockUser(t *testing.T) *User {
 	db := mock.DB(t)
-	user, _ := Get(db, "mockUser1")
+	user, _ := Get(db, "mockUser")
 	return user
 }
 
@@ -23,9 +23,9 @@ func TestNew(t *testing.T) {
 	db := mock.DB(t)
 
 	// success
-	user := New(db, "user.mockUser1", "1.1.1.1", mockTime)
+	user := New(db, "user.mockUser", "1.1.1.1", mockTime)
 	assert.Equal(t, db, user.DB)
-	assert.Equal(t, "user.mockUser1", user.Path)
+	assert.Equal(t, "user.mockUser", user.Path)
 	assert.Equal(t, "1.1.1.1", user.Addr)
 	assert.Equal(t, mockTime, user.Init)
 }
@@ -52,9 +52,9 @@ func TestGet(t *testing.T) {
 	db := mock.DB(t)
 
 	// success
-	user, err := Get(db, "mockUser1")
+	user, err := Get(db, "mockUser")
 	assert.Equal(t, db, user.DB)
-	assert.Equal(t, "user.mockUser1", user.Path)
+	assert.Equal(t, "user.mockUser", user.Path)
 	assert.Equal(t, "1.1.1.1", user.Addr)
 	assert.Equal(t, mockTime, user.Init)
 	assert.NoError(t, err)
@@ -69,7 +69,7 @@ func TestDelete(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	asrt.NoBucket(t, user.DB, "user.mockUser1")
+	asrt.NoBucket(t, user.DB, "user.mockUser")
 }
 
 func TestGetPair(t *testing.T) {
@@ -79,7 +79,7 @@ func TestGetPair(t *testing.T) {
 	// success
 	pair, err := user.GetPair("alpha")
 	assert.Equal(t, user.DB, pair.DB)
-	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
+	assert.Equal(t, "pair.mockUser.alpha", pair.Path)
 	assert.Equal(t, "Alpha.", pair.Body)
 	assert.Equal(t, mockTime, pair.Init)
 	assert.NoError(t, err)
@@ -92,8 +92,8 @@ func TestListPairs(t *testing.T) {
 	// success
 	pairs, err := user.ListPairs()
 	assert.Len(t, pairs, 2)
-	assert.Equal(t, "pair.mockUser1.alpha", pairs[0].Path)
-	assert.Equal(t, "pair.mockUser1.bravo", pairs[1].Path)
+	assert.Equal(t, "pair.mockUser.alpha", pairs[0].Path)
+	assert.Equal(t, "pair.mockUser.bravo", pairs[1].Path)
 	assert.NoError(t, err)
 }
 
@@ -103,7 +103,7 @@ func TestMap(t *testing.T) {
 
 	// success
 	bmap := user.Map()
-	assert.Equal(t, mock.Data["user.mockUser1"], bmap)
+	assert.Equal(t, mock.Data["user.mockUser"], bmap)
 }
 
 func TestSetPair(t *testing.T) {
@@ -113,13 +113,13 @@ func TestSetPair(t *testing.T) {
 	// success
 	pair, err := user.SetPair("name", "body")
 	assert.Equal(t, user.DB, pair.DB)
-	assert.Equal(t, "pair.mockUser1.name", pair.Path)
+	assert.Equal(t, "pair.mockUser.name", pair.Path)
 	assert.Equal(t, "body", pair.Body)
 	asrt.TimeNow(t, pair.Init)
 	assert.NoError(t, err)
 
 	// confirm - database
-	asrt.Bucket(t, user.DB, "pair.mockUser1.name", pair.Map())
+	asrt.Bucket(t, user.DB, "pair.mockUser.name", pair.Map())
 }
 
 func TestUUID(t *testing.T) {
@@ -128,5 +128,5 @@ func TestUUID(t *testing.T) {
 
 	// success
 	uuid := user.UUID()
-	assert.Equal(t, "mockUser1", uuid)
+	assert.Equal(t, "mockUser", uuid)
 }

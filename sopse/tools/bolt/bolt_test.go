@@ -25,11 +25,11 @@ func TestDelete(t *testing.T) {
 	db := mock.DB(t)
 
 	// success
-	err := Delete(db, "user.mockUser1")
+	err := Delete(db, "user.mockUser")
 	assert.NoError(t, err)
 
 	// confirm - database
-	asrt.NoBucket(t, db, "user.mockUser1")
+	asrt.NoBucket(t, db, "user.mockUser")
 }
 
 func TestExists(t *testing.T) {
@@ -37,7 +37,7 @@ func TestExists(t *testing.T) {
 	db := mock.DB(t)
 
 	// success - true
-	okay, err := Exists(db, "user.mockUser1")
+	okay, err := Exists(db, "user.mockUser")
 	assert.True(t, okay)
 	assert.NoError(t, err)
 
@@ -52,8 +52,8 @@ func TestGet(t *testing.T) {
 	db := mock.DB(t)
 
 	// success - bucket exists
-	bmap, err := Get(db, "user.mockUser1")
-	assert.Equal(t, mock.Data["user.mockUser1"], bmap)
+	bmap, err := Get(db, "user.mockUser")
+	assert.Equal(t, mock.Data["user.mockUser"], bmap)
 	assert.NoError(t, err)
 
 	// success - bucket does not exist
@@ -64,8 +64,8 @@ func TestGet(t *testing.T) {
 
 func TestJoin(t *testing.T) {
 	// success
-	path := Join("user", "mockUser1", "alpha")
-	assert.Equal(t, "user.mockUser1.alpha", path)
+	path := Join("user", "mockUser", "alpha")
+	assert.Equal(t, "user.mockUser.alpha", path)
 }
 
 func TestList(t *testing.T) {
@@ -73,10 +73,10 @@ func TestList(t *testing.T) {
 	db := mock.DB(t)
 
 	// success
-	paths, err := List(db, "pair.mockUser1")
+	paths, err := List(db, "pair.mockUser")
 	assert.Equal(t, []string{
-		"pair.mockUser1.alpha",
-		"pair.mockUser1.bravo",
+		"pair.mockUser.alpha",
+		"pair.mockUser.bravo",
 	}, paths)
 	assert.NoError(t, err)
 }
@@ -95,8 +95,8 @@ func TestSet(t *testing.T) {
 
 func TestSplit(t *testing.T) {
 	// success
-	head, uuid, name := Split("user.mockUser1.alpha")
+	head, uuid, name := Split("user.mockUser.alpha")
 	assert.Equal(t, "user", head)
-	assert.Equal(t, "mockUser1", uuid)
+	assert.Equal(t, "mockUser", uuid)
 	assert.Equal(t, "alpha", name)
 }

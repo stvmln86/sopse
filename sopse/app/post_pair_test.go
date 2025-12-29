@@ -11,12 +11,12 @@ import (
 
 func TestPostPair(t *testing.T) {
 	// success
-	app, w := mockRun(t, "POST", "/api/mockUser1/name", "body")
+	app, w := mockRun(t, "POST", "/api/mockUser/name", "body")
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Equal(t, "ok", w.Body.String())
 
 	// confirm - database
-	pair, err := pair.Get(app.DB, "mockUser1", "name")
+	pair, err := pair.Get(app.DB, "mockUser", "name")
 	assert.Equal(t, "body", pair.Body)
 	asrt.TimeNow(t, pair.Init)
 	assert.NoError(t, err)

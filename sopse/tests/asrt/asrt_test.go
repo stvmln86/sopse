@@ -12,7 +12,7 @@ func TestBucket(t *testing.T) {
 	db := mock.DB(t)
 
 	// success
-	Bucket(t, db, "user.mockUser1", mock.Data["user.mockUser1"])
+	Bucket(t, db, "user.mockUser", mock.Data["user.mockUser"])
 }
 
 func TestNoBucket(t *testing.T) {

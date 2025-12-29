@@ -10,17 +10,17 @@ import (
 
 // Data is a map of mock database data for unit testing.
 var Data = map[string]map[string]string{
-	"user.mockUser1": {
+	"user.mockUser": {
 		"addr": "1.1.1.1",
 		"init": "1000",
 	},
 
-	"pair.mockUser1.alpha": {
+	"pair.mockUser.alpha": {
 		"body": "Alpha.",
 		"init": "1000",
 	},
 
-	"pair.mockUser1.bravo": {
+	"pair.mockUser.bravo": {
 		"body": "Bravo.",
 		"init": "1001",
 	},

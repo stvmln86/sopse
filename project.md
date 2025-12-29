@@ -1,7 +1,7 @@
 # Project Notes 
 
 ## 2025-12-30
-- [ ] Rename `mockUser1` to just `mockUser`.
+- [x] Rename `mockUser1` to just `mockUser`.
 - [ ] Add capacity hints to all `make()` calls.
 - [ ] Remove head from database paths, e.g.: `uuid` and `uuid.name`.
   - [ ] Remove `bolt.Join` and `bolt.Split`.

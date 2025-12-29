@@ -13,7 +13,7 @@ var mockTime = time.Unix(1000, 0).Local()
 
 func mockPair(t *testing.T) *Pair {
 	db := mock.DB(t)
-	pair, _ := Get(db, "mockUser1", "alpha")
+	pair, _ := Get(db, "mockUser", "alpha")
 	return pair
 }
 
@@ -22,9 +22,9 @@ func TestNew(t *testing.T) {
 	db := mock.DB(t)
 
 	// success
-	pair := New(db, "pair.mockUser1.alpha", "Alpha.", mockTime)
+	pair := New(db, "pair.mockUser.alpha", "Alpha.", mockTime)
 	assert.Equal(t, db, pair.DB)
-	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
+	assert.Equal(t, "pair.mockUser.alpha", pair.Path)
 	assert.Equal(t, "Alpha.", pair.Body)
 	assert.Equal(t, mockTime, pair.Init)
 }
@@ -34,9 +34,9 @@ func TestGet(t *testing.T) {
 	db := mock.DB(t)
 
 	// success
-	pair, err := Get(db, "mockUser1", "alpha")
+	pair, err := Get(db, "mockUser", "alpha")
 	assert.Equal(t, db, pair.DB)
-	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
+	assert.Equal(t, "pair.mockUser.alpha", pair.Path)
 	assert.Equal(t, "Alpha.", pair.Body)
 	assert.Equal(t, mockTime, pair.Init)
 	assert.NoError(t, err)
@@ -47,15 +47,15 @@ func TestSet(t *testing.T) {
 	db := mock.DB(t)
 
 	// success
-	pair, err := Set(db, "mockUser1", "alpha", "body")
+	pair, err := Set(db, "mockUser", "alpha", "body")
 	assert.Equal(t, db, pair.DB)
-	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
+	assert.Equal(t, "pair.mockUser.alpha", pair.Path)
 	assert.Equal(t, "body", pair.Body)
 	asrt.TimeNow(t, pair.Init)
 	assert.NoError(t, err)
 
 	// confirm - database
-	asrt.Bucket(t, db, "pair.mockUser1.alpha", pair.Map())
+	asrt.Bucket(t, db, "pair.mockUser.alpha", pair.Map())
 }
 
 func TestDelete(t *testing.T) {
@@ -67,7 +67,7 @@ func TestDelete(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	asrt.NoBucket(t, pair.DB, "pair.mockUser1.alpha")
+	asrt.NoBucket(t, pair.DB, "pair.mockUser.alpha")
 }
 
 func TestExpired(t *testing.T) {
@@ -85,7 +85,7 @@ func TestMap(t *testing.T) {
 
 	// success
 	bmap := pair.Map()
-	assert.Equal(t, mock.Data["pair.mockUser1.alpha"], bmap)
+	assert.Equal(t, mock.Data["pair.mockUser.alpha"], bmap)
 }
 
 func TestName(t *testing.T) {
@@ -106,5 +106,5 @@ func TestUpdate(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	asrt.Bucket(t, pair.DB, "pair.mockUser1.alpha", pair.Map())
+	asrt.Bucket(t, pair.DB, "pair.mockUser.alpha", pair.Map())
 }
