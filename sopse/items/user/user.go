@@ -74,7 +74,7 @@ func (u *User) ListPairs() ([]*pair.Pair, error) {
 		return nil, fmt.Errorf("cannot list User %q - %w", u.Path, err)
 	}
 
-	var pairs []*pair.Pair
+	var pairs = make([]*pair.Pair, 0, len(paths))
 	for _, path := range paths {
 		_, uuid, name := bolt.Split(path)
 		pair, err := pair.Get(u.DB, uuid, name)

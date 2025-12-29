@@ -27,7 +27,7 @@ func (a *App) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var names []string
+	var names = make([]string, 0, len(pairs))
 	for _, pair := range pairs {
 		names = append(names, pair.Name())
 	}

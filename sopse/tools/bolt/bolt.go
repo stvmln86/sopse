@@ -36,7 +36,7 @@ func Get(db *bbolt.DB, path string) (map[string]string, error) {
 	var bmap map[string]string
 	return bmap, db.View(func(tx *bbolt.Tx) error {
 		if buck := tx.Bucket([]byte(path)); buck != nil {
-			bmap = make(map[string]string)
+			bmap = make(map[string]string, 2)
 			return buck.ForEach(func(attr, data []byte) error {
 				bmap[string(attr)] = string(data)
 				return nil
@@ -54,7 +54,7 @@ func Join(elems ...string) string {
 
 // List returns all existing database bucket paths containing a prefix.
 func List(db *bbolt.DB, pref string) ([]string, error) {
-	var paths []string
+	var paths = make([]string, 0, 0)
 	return paths, db.View(func(tx *bbolt.Tx) error {
 		return tx.ForEach(func(path []byte, _ *bbolt.Bucket) error {
 			if strings.HasPrefix(string(path), pref) {
