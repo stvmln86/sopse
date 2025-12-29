@@ -9,7 +9,7 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-var time1000 = time.Unix(1000, 0).Local()
+var mockTime = time.Unix(1000, 0).Local()
 
 func mockPair(t *testing.T) *Pair {
 	db := test.DB(t)
@@ -23,11 +23,11 @@ func TestNew(t *testing.T) {
 	db := test.DB(t)
 
 	// success
-	pair := New(db, "addr", "body", time1000)
+	pair := New(db, "addr", "body", mockTime)
 	assert.Equal(t, db, pair.DB)
 	assert.Equal(t, "addr", pair.Addr)
 	assert.Equal(t, "body", pair.Body)
-	assert.Equal(t, time1000, pair.Init)
+	assert.Equal(t, mockTime, pair.Init)
 }
 
 func TestGet(t *testing.T) {
@@ -39,7 +39,7 @@ func TestGet(t *testing.T) {
 	assert.Equal(t, db, pair.DB)
 	assert.Equal(t, "pair.mockUser1.alpha", pair.Addr)
 	assert.Equal(t, "Alpha.", pair.Body)
-	assert.Equal(t, time1000, pair.Init)
+	assert.Equal(t, mockTime, pair.Init)
 	assert.NoError(t, err)
 }
 
@@ -48,11 +48,11 @@ func TestSet(t *testing.T) {
 	db := test.DB(t)
 
 	// success
-	pair, err := Set(db, "mockUser1", "alpha", "body", time1000)
+	pair, err := Set(db, "mockUser1", "alpha", "body", mockTime)
 	assert.Equal(t, db, pair.DB)
 	assert.Equal(t, "pair.mockUser1.alpha", pair.Addr)
 	assert.Equal(t, "body", pair.Body)
-	assert.Equal(t, time1000, pair.Init)
+	assert.Equal(t, mockTime, pair.Init)
 	assert.NoError(t, err)
 
 	// confirm - database

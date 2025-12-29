@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var mockTime = time.Unix(1000, 0).Local()
+
 func TestExpired(t *testing.T) {
 	// setup
 	tobj := time.Now().Add(-1 * time.Minute)
@@ -22,23 +24,19 @@ func TestExpired(t *testing.T) {
 
 func TestTime(t *testing.T) {
 	// setup
-	want := time.Unix(1000, 0).Local()
-	fail := time.Unix(0, 0).Local()
+	failTime := time.Unix(0, 0).Local()
 
 	// success - valid time
 	tobj := Time("1000")
-	assert.Equal(t, want, tobj)
+	assert.Equal(t, mockTime, tobj)
 
 	// failure - invalid time
 	tobj = Time("")
-	assert.Equal(t, fail, tobj)
+	assert.Equal(t, failTime, tobj)
 }
 
 func TestUnix(t *testing.T) {
-	// setup
-	tobj := time.Unix(1000, 0).Local()
-
 	// success
-	unix := Unix(tobj)
+	unix := Unix(mockTime)
 	assert.Equal(t, "1000", unix)
 }

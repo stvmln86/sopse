@@ -60,8 +60,8 @@ func (p *Pair) Delete() error {
 }
 
 // Expired returns true if the Pair is past a duration.
-func (p *Pair) Expired(dura time.Duration) bool {
-	return neat.Expired(p.Init, dura)
+func (p *Pair) Expired(duration time.Duration) bool {
+	return neat.Expired(p.Init, duration)
 }
 
 // Map returns the Pair as a string map.
