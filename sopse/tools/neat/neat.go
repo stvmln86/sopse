@@ -11,15 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
-// Expired returns true if a Time object is past a duration.
-func Expired(tobj time.Time, dura time.Duration) bool {
-	return time.Now().After(tobj.Add(dura))
-}
-
 // Addr returns the remote IP address from a Request.
 func Addr(r *http.Request) string {
 	host, _, _ := net.SplitHostPort(r.RemoteAddr)
 	return host
+}
+
+// Expired returns true if a Time object is past a duration.
+func Expired(tobj time.Time, dura time.Duration) bool {
+	return time.Now().After(tobj.Add(dura))
 }
 
 // Time returns a local Time object from a Unix UTC string.

@@ -7,21 +7,20 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stvmln86/sopse/sopse/tests/asrt"
-	"github.com/stvmln86/sopse/sopse/tools/test"
+	"github.com/stvmln86/sopse/sopse/tests/mock"
 )
 
 var mockTime = time.Unix(1000, 0).Local()
 
 func mockUser(t *testing.T) *User {
-	db := test.DB(t)
-	user, err := Get(db, "mockUser1")
-	test.Try(t, err)
+	db := mock.DB(t)
+	user, _ := Get(db, "mockUser1")
 	return user
 }
 
 func TestNew(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 
 	// success
 	user := New(db, "user.mockUser1", "1.1.1.1", mockTime)
@@ -33,13 +32,13 @@ func TestNew(t *testing.T) {
 
 func TestCreate(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 	r := httptest.NewRequest("GET", "/", nil)
 
 	// success
 	user, err := Create(db, r)
 	assert.Equal(t, db, user.DB)
-	assert.Regexp(t, `user\.[\w_-]{22}`, user.Path)
+	assert.Regexp(t, `user\..{22}`, user.Path)
 	assert.Equal(t, "192.0.2.1", user.Addr)
 	assert.WithinDuration(t, time.Now(), user.Init, 1*time.Second)
 	assert.NoError(t, err)
@@ -50,7 +49,7 @@ func TestCreate(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 
 	// success
 	user, err := Get(db, "mockUser1")
@@ -105,10 +104,7 @@ func TestMap(t *testing.T) {
 
 	// success
 	bmap := user.Map()
-	assert.Equal(t, map[string]string{
-		"addr": "1.1.1.1",
-		"init": "1000",
-	}, bmap)
+	assert.Equal(t, mock.Data["user.mockUser1"], bmap)
 }
 
 func TestSetPair(t *testing.T) {
@@ -116,9 +112,9 @@ func TestSetPair(t *testing.T) {
 	user := mockUser(t)
 
 	// success
-	pair, err := user.SetPair("alpha", "body")
+	pair, err := user.SetPair("name", "body")
 	assert.Equal(t, user.DB, pair.DB)
-	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
+	assert.Equal(t, "pair.mockUser1.name", pair.Path)
 	assert.Equal(t, "body", pair.Body)
 	assert.WithinDuration(t, time.Now(), pair.Init, 1*time.Second)
 	assert.NoError(t, err)

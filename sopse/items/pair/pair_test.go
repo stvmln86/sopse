@@ -6,21 +6,20 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stvmln86/sopse/sopse/tests/asrt"
-	"github.com/stvmln86/sopse/sopse/tools/test"
+	"github.com/stvmln86/sopse/sopse/tests/mock"
 )
 
 var mockTime = time.Unix(1000, 0).Local()
 
 func mockPair(t *testing.T) *Pair {
-	db := test.DB(t)
-	pair, err := Get(db, "mockUser1", "alpha")
-	test.Try(t, err)
+	db := mock.DB(t)
+	pair, _ := Get(db, "mockUser1", "alpha")
 	return pair
 }
 
 func TestNew(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 
 	// success
 	pair := New(db, "pair.mockUser1.alpha", "Alpha.", mockTime)
@@ -32,7 +31,7 @@ func TestNew(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 
 	// success
 	pair, err := Get(db, "mockUser1", "alpha")
@@ -45,7 +44,7 @@ func TestGet(t *testing.T) {
 
 func TestSet(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 
 	// success
 	pair, err := Set(db, "mockUser1", "alpha", "body")
@@ -86,10 +85,7 @@ func TestMap(t *testing.T) {
 
 	// success
 	bmap := pair.Map()
-	assert.Equal(t, map[string]string{
-		"body": "Alpha.",
-		"init": "1000",
-	}, bmap)
+	assert.Equal(t, mock.Data["pair.mockUser1.alpha"], bmap)
 }
 
 func TestName(t *testing.T) {

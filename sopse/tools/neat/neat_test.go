@@ -10,6 +10,15 @@ import (
 
 var mockTime = time.Unix(1000, 0).Local()
 
+func TestAddr(t *testing.T) {
+	// setup
+	r := httptest.NewRequest("GET", "/", nil)
+
+	// success
+	addr := Addr(r)
+	assert.Equal(t, "192.0.2.1", addr)
+}
+
 func TestExpired(t *testing.T) {
 	// setup
 	tobj := time.Now().Add(-1 * time.Minute)
@@ -21,15 +30,6 @@ func TestExpired(t *testing.T) {
 	// success - false
 	okay = Expired(tobj, 2*time.Minute)
 	assert.False(t, okay)
-}
-
-func TestAddr(t *testing.T) {
-	// setup
-	r := httptest.NewRequest("GET", "/", nil)
-
-	// success
-	addr := Addr(r)
-	assert.Equal(t, "192.0.2.1", addr)
 }
 
 func TestTime(t *testing.T) {

@@ -1,18 +1,19 @@
-package test
+package mock
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stvmln86/sopse/sopse/tests/asrt"
 )
 
 func TestDB(t *testing.T) {
 	// success
 	db := DB(t)
 	assert.Contains(t, db.Path(), "TestDB.db")
-}
 
-func TestTry(t *testing.T) {
-	// success
-	Try(t, nil)
+	// confirm - database
+	for name, bmap := range Data {
+		asrt.Bucket(t, db, name, bmap)
+	}
 }

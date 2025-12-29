@@ -20,6 +20,8 @@ go install github.com/stvmln86/sopse@latest
 ### 2025-12-29
 - change `tools/test` to `test/mock`
 - change "database entry" wording to "bucket" in `tools/bolt`
+- fix `name`/`path` naming in bolt code
+- fix literal placeholders ("name", "body", etc)
 
 ## Contributing
 

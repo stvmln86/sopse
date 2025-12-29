@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stvmln86/sopse/sopse/tests/asrt"
-	"github.com/stvmln86/sopse/sopse/tools/test"
+	"github.com/stvmln86/sopse/sopse/tests/mock"
 )
 
 func TestConnect(t *testing.T) {
@@ -22,7 +22,7 @@ func TestConnect(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 
 	// success
 	err := Delete(db, "user.mockUser1")
@@ -34,7 +34,7 @@ func TestDelete(t *testing.T) {
 
 func TestExists(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 
 	// success - true
 	okay, err := Exists(db, "user.mockUser1")
@@ -49,11 +49,11 @@ func TestExists(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 
 	// success - entry exists
 	bmap, err := Get(db, "user.mockUser1")
-	assert.Equal(t, test.MockData["user.mockUser1"], bmap)
+	assert.Equal(t, mock.Data["user.mockUser1"], bmap)
 	assert.NoError(t, err)
 
 	// success - entry does not exist
@@ -70,7 +70,7 @@ func TestJoin(t *testing.T) {
 
 func TestList(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 
 	// success
 	paths, err := List(db, "pair.mockUser1")
@@ -83,7 +83,7 @@ func TestList(t *testing.T) {
 
 func TestSet(t *testing.T) {
 	// setup
-	db := test.DB(t)
+	db := mock.DB(t)
 
 	// success
 	err := Set(db, "path", map[string]string{"attr": "data"})
