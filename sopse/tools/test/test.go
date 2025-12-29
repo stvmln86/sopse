@@ -25,9 +25,15 @@ func DB(t *testing.T, inits ...bool) *bbolt.DB {
 	if len(inits) != 0 && inits[0] {
 		Try(t, db.Update(func(tx *bbolt.Tx) error {
 			for name, pairs := range mockData {
-				buck, _ := tx.CreateBucketIfNotExists([]byte(name))
+				buck, err := tx.CreateBucketIfNotExists([]byte(name))
+				if err != nil {
+					return err
+				}
+
 				for attr, data := range pairs {
-					buck.Put([]byte(attr), []byte(data))
+					if err := buck.Put([]byte(attr), []byte(data)); err != nil {
+						return err
+					}
 				}
 			}
 
@@ -52,10 +58,13 @@ func Get(t *testing.T, db *bbolt.DB, name, attr string) string {
 
 // Set sets a new or existing database value.
 func Set(t *testing.T, db *bbolt.DB, name, attr, data string) {
-	Try(t, db.Update(func(tx *bbolt.Tx) error {
-		buck, _ := tx.CreateBucketIfNotExists([]byte(name))
-		buck.Put([]byte(attr), []byte(data))
-		return nil
+	Try(t, db.Batch(func(tx *bbolt.Tx) error {
+		buck, err := tx.CreateBucketIfNotExists([]byte(name))
+		if err != nil {
+			return err
+		}
+
+		return buck.Put([]byte(attr), []byte(data))
 	}))
 }
 
