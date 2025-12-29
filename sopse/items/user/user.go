@@ -25,7 +25,7 @@ func New(db *bbolt.DB, path, addr string, init time.Time) *User {
 	return &User{db, path, addr, init}
 }
 
-// Create creates and returns a new
+// Create creates and returns a new User.
 func Create(db *bbolt.DB, r *http.Request) (*User, error) {
 	path := bolt.Join("user", neat.UUID())
 	addr := neat.Addr(r)
