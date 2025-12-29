@@ -15,11 +15,11 @@ var MockData = map[string]map[string]string{
 	"pair.mockUser1.bravo": {"body": "Bravo.", "init": "1100"},
 }
 
-// DB returns a temporary database containing mockData.
+// DB returns a temporary database containing MockData.
 func DB(t *testing.T) *bbolt.DB {
 	dire := t.TempDir()
-	dest := filepath.Join(dire, t.Name()+".db")
-	db, err := bbolt.Open(dest, 0644, nil)
+	path := filepath.Join(dire, t.Name()+".db")
+	db, err := bbolt.Open(path, 0600, nil)
 	Try(t, err)
 
 	Try(t, db.Update(func(tx *bbolt.Tx) error {
