@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stvmln86/sopse/sopse/tests/asrt"
 	"github.com/stvmln86/sopse/sopse/tools/test"
-	"go.etcd.io/bbolt"
 )
 
 var mockTime = time.Unix(1000, 0).Local()
@@ -45,15 +45,7 @@ func TestCreate(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	test.Try(t, db.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte(user.Path))
-		for attr, want := range user.Map() {
-			data := string(buck.Get([]byte(attr)))
-			assert.Equal(t, want, data)
-		}
-
-		return nil
-	}))
+	asrt.Bucket(t, db, user.Path, user.Map())
 }
 
 func TestGet(t *testing.T) {
@@ -78,11 +70,7 @@ func TestDelete(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	test.Try(t, user.DB.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte("user.mockUser1"))
-		assert.Nil(t, buck)
-		return nil
-	}))
+	asrt.NoBucket(t, user.DB, "user.mockUser1")
 }
 
 func TestGetPair(t *testing.T) {
@@ -136,15 +124,7 @@ func TestSetPair(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	test.Try(t, user.DB.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte("pair.mockUser1.alpha"))
-		for attr, want := range pair.Map() {
-			data := string(buck.Get([]byte(attr)))
-			assert.Equal(t, want, data)
-		}
-
-		return nil
-	}))
+	asrt.Bucket(t, user.DB, "pair.mockUser1.alpha", pair.Map())
 }
 
 func TestUUID(t *testing.T) {

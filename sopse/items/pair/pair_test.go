@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stvmln86/sopse/sopse/tests/asrt"
 	"github.com/stvmln86/sopse/sopse/tools/test"
-	"go.etcd.io/bbolt"
 )
 
 var mockTime = time.Unix(1000, 0).Local()
@@ -56,15 +56,7 @@ func TestSet(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	test.Try(t, db.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte("pair.mockUser1.alpha"))
-		for attr, want := range pair.Map() {
-			data := string(buck.Get([]byte(attr)))
-			assert.Equal(t, want, data)
-		}
-
-		return nil
-	}))
+	asrt.Bucket(t, db, "pair.mockUser1.alpha", pair.Map())
 }
 
 func TestDelete(t *testing.T) {
@@ -76,11 +68,7 @@ func TestDelete(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	test.Try(t, pair.DB.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte("pair.mockUser1.alpha"))
-		assert.Nil(t, buck)
-		return nil
-	}))
+	asrt.NoBucket(t, pair.DB, "pair.mockUser1.alpha")
 }
 
 func TestExpired(t *testing.T) {
@@ -122,10 +110,5 @@ func TestUpdate(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	test.Try(t, pair.DB.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte("pair.mockUser1.alpha"))
-		body := string(buck.Get([]byte("body")))
-		assert.Equal(t, "body", body)
-		return nil
-	}))
+	asrt.Bucket(t, pair.DB, "pair.mockUser1.alpha", pair.Map())
 }

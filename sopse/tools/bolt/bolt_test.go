@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stvmln86/sopse/sopse/tests/asrt"
 	"github.com/stvmln86/sopse/sopse/tools/test"
-	"go.etcd.io/bbolt"
 )
 
 func TestConnect(t *testing.T) {
@@ -29,11 +29,7 @@ func TestDelete(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	test.Try(t, db.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte("user.mockUser1"))
-		assert.Nil(t, buck)
-		return nil
-	}))
+	asrt.NoBucket(t, db, "user.mockUser1")
 }
 
 func TestExists(t *testing.T) {
@@ -94,10 +90,5 @@ func TestSet(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	test.Try(t, db.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte("path"))
-		data := string(buck.Get([]byte("attr")))
-		assert.Equal(t, "data", data)
-		return nil
-	}))
+	asrt.Bucket(t, db, "path", map[string]string{"attr": "data"})
 }

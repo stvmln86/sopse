@@ -15,6 +15,12 @@ go install github.com/stvmln86/sopse@latest
 
 ...or download the [latest binary release][re] for your platform.
 
+## Project Notes
+
+### 2025-12-29
+- change `tools/test` to `test/mock`
+- change "database entry" wording to "bucket" in `tools/bolt`
+
 ## Contributing
 
 Please submit all bug reports and feature requests to the [issue tracker][is], thank you.
