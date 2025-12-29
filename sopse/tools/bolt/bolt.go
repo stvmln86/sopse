@@ -10,7 +10,7 @@ import (
 
 // Connect returns a new database connection.
 func Connect(path string) (*bbolt.DB, error) {
-	return bbolt.Open(path, 0644, &bbolt.Options{
+	return bbolt.Open(path, 0600, &bbolt.Options{
 		Timeout: 10 * time.Second,
 	})
 }
