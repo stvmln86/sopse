@@ -9,7 +9,7 @@ import (
 func TestDB(t *testing.T) {
 	// success
 	db := DB(t, true)
-	assert.NotNil(t, db)
+	assert.Contains(t, db.Path(), "TestDB.db")
 
 	// confirm - database
 	for name, pairs := range mockData {
@@ -18,6 +18,20 @@ func TestDB(t *testing.T) {
 			assert.Equal(t, want, data)
 		}
 	}
+}
+
+func TestExists(t *testing.T) {
+	// setup
+	db := DB(t, false)
+	Set(t, db, "name", "attr", "data")
+
+	// success - true
+	okay := Exists(t, db, "name")
+	assert.True(t, okay)
+
+	// success - false
+	okay = Exists(t, db, "nope")
+	assert.False(t, okay)
 }
 
 func TestGet(t *testing.T) {

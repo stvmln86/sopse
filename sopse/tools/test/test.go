@@ -16,13 +16,13 @@ var mockData = map[string]map[string]string{
 }
 
 // DB returns a temporary database containing mockData.
-func DB(t *testing.T, inits ...bool) *bbolt.DB {
+func DB(t *testing.T, init bool) *bbolt.DB {
 	dire := t.TempDir()
 	dest := filepath.Join(dire, t.Name()+".db")
 	db, err := bbolt.Open(dest, 0644, nil)
 	Try(t, err)
 
-	if len(inits) != 0 && inits[0] {
+	if init {
 		Try(t, db.Update(func(tx *bbolt.Tx) error {
 			for name, pairs := range mockData {
 				buck, err := tx.CreateBucketIfNotExists([]byte(name))
@@ -42,6 +42,17 @@ func DB(t *testing.T, inits ...bool) *bbolt.DB {
 	}
 
 	return db
+}
+
+// Exists returns true if a database entry exists.
+func Exists(t *testing.T, db *bbolt.DB, name string) bool {
+	var okay bool
+	Try(t, db.View(func(tx *bbolt.Tx) error {
+		okay = tx.Bucket([]byte(name)) != nil
+		return nil
+	}))
+
+	return okay
 }
 
 // Get returns a database value.
