@@ -58,7 +58,10 @@ func List(db *bbolt.DB, pref string) ([]string, error) {
 	var names []string
 	return names, db.View(func(tx *bbolt.Tx) error {
 		return tx.ForEach(func(name []byte, _ *bbolt.Bucket) error {
-			names = append(names, string(name))
+			if strings.HasPrefix(string(name), pref) {
+				names = append(names, string(name))
+			}
+
 			return nil
 		})
 	})

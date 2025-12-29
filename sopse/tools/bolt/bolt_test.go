@@ -57,11 +57,7 @@ func TestGet(t *testing.T) {
 
 	// success - entry exists
 	bmap, err := Get(db, "user.mockUser1")
-	assert.Equal(t, map[string]string{
-		"hash": "mockUser1",
-		"addr": "1.1.1.1",
-		"init": "1000",
-	}, bmap)
+	assert.Equal(t, test.MockData["user.mockUser1"], bmap)
 	assert.NoError(t, err)
 
 	// success - entry does not exist

@@ -8,8 +8,8 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-// mockData is a map of mock database data for unit testing.
-var mockData = map[string]map[string]string{
+// MockData is a map of mock database data for unit testing.
+var MockData = map[string]map[string]string{
 	"user.mockUser1":       {"hash": "mockUser", "addr": "1.1.1.1", "init": "1000"},
 	"pair.mockUser1.alpha": {"name": "alpha", "body": "Alpha.", "init": "1000"},
 	"pair.mockUser1.bravo": {"name": "bravo", "body": "Bravo.", "init": "1100"},
@@ -23,7 +23,7 @@ func DB(t *testing.T) *bbolt.DB {
 	Try(t, err)
 
 	Try(t, db.Update(func(tx *bbolt.Tx) error {
-		for name, bmap := range mockData {
+		for name, bmap := range MockData {
 			buck, err := tx.CreateBucketIfNotExists([]byte(name))
 			if err != nil {
 				return err
