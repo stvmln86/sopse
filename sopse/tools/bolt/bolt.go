@@ -54,7 +54,7 @@ func Join(elems ...string) string {
 
 // List returns all existing database bucket paths containing a prefix.
 func List(db *bbolt.DB, pref string) ([]string, error) {
-	var paths = make([]string, 0, 0)
+	var paths = make([]string, 0)
 	return paths, db.View(func(tx *bbolt.Tx) error {
 		return tx.ForEach(func(path []byte, _ *bbolt.Bucket) error {
 			if strings.HasPrefix(string(path), pref) {
