@@ -22,7 +22,7 @@ func TestPostPair(t *testing.T) {
 	assert.NoError(t, err)
 
 	// failure - not found
-	_, w = mockRun(t, "GET", "/nope/name", "body")
+	_, w = mockRun(t, "POST", "/nope/name", "body")
 	assert.Equal(t, http.StatusNotFound, w.Code)
 	assert.Equal(t, "error 404: not found", w.Body.String())
 }

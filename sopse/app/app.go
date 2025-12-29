@@ -48,6 +48,7 @@ func (a *App) ServeMux() *http.ServeMux {
 	smux := http.NewServeMux()
 	for path, hand := range map[string]http.HandlerFunc{
 		"GET /":               a.GetIndexOr404,
+		"GET /{uuid}":         a.GetUser,
 		"POST /new":           a.PostNewUser,
 		"POST /{uuid}/{name}": a.PostPair,
 	} {
