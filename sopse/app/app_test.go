@@ -53,20 +53,6 @@ func TestClose(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestServeMux(t *testing.T) {
-	// setup
-	app := mockApp(t)
-
-	// success
-	smux := app.ServeMux()
-	assert.NotNil(t, smux)
-}
-
-func TestServer(t *testing.T) {
-	// setup
-	app := mockApp(t)
-
-	// success
-	serv := app.Server()
-	assert.NotNil(t, serv)
+func TestStart(t *testing.T) {
+	// cannot test main server
 }

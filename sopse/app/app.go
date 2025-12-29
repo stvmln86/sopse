@@ -8,6 +8,7 @@ import (
 
 	"github.com/stvmln86/sopse/sopse/tools/bolt"
 	"github.com/stvmln86/sopse/sopse/tools/conf"
+	"github.com/stvmln86/sopse/sopse/tools/ware"
 	"go.etcd.io/bbolt"
 )
 
@@ -42,19 +43,22 @@ func (a *App) Close() error {
 	return nil
 }
 
-// ServeMux returns a new ServeMux with the App's handlers.
-func (a *App) ServeMux() *http.ServeMux {
+// Start starts the App's server.
+func (a *App) Start() error {
 	smux := http.NewServeMux()
-	return smux
-}
+	for path, hand := range map[string]http.HandlerFunc{
+		// "GET /": a.GetIndexOr404,
+	} {
+		smux.Handle(path, ware.Apply(hand, a.Conf.UserRate))
+	}
 
-// Server returns a new Server with the App's handlers.
-func (a *App) Server() *http.Server {
-	return &http.Server{
+	serv := &http.Server{
 		Addr:         a.Conf.Addr,
-		Handler:      a.ServeMux(),
+		Handler:      smux,
 		IdleTimeout:  60 * time.Second,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 	}
+
+	return serv.ListenAndServe()
 }
