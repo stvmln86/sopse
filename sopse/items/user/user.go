@@ -85,7 +85,7 @@ func (u *User) Map() map[string]string {
 	}
 }
 
-// SetPair sets and returns a new or existing Pair for the User.
+// SetPair sets and returns a new or existing Pair into the User.
 func (u *User) SetPair(name, body string) (*pair.Pair, error) {
 	return pair.Set(u.DB, u.UUID(), name, body)
 }

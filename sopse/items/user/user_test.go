@@ -120,7 +120,7 @@ func TestSetPair(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	asrt.Bucket(t, user.DB, "pair.mockUser1.alpha", pair.Map())
+	asrt.Bucket(t, user.DB, "pair.mockUser1.name", pair.Map())
 }
 
 func TestUUID(t *testing.T) {
@@ -128,6 +128,6 @@ func TestUUID(t *testing.T) {
 	user := mockUser(t)
 
 	// success
-	name := user.UUID()
-	assert.Equal(t, "mockUser1", name)
+	uuid := user.UUID()
+	assert.Equal(t, "mockUser1", uuid)
 }

@@ -13,7 +13,7 @@ func TestDB(t *testing.T) {
 	assert.Contains(t, db.Path(), "TestDB.db")
 
 	// confirm - database
-	for name, bmap := range Data {
-		asrt.Bucket(t, db, name, bmap)
+	for path, bmap := range Data {
+		asrt.Bucket(t, db, path, bmap)
 	}
 }

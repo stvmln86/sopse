@@ -15,14 +15,14 @@ func Connect(path string) (*bbolt.DB, error) {
 	})
 }
 
-// Delete deletes an existing database entry.
+// Delete deletes an existing database bucket.
 func Delete(db *bbolt.DB, path string) error {
 	return db.Update(func(tx *bbolt.Tx) error {
 		return tx.DeleteBucket([]byte(path))
 	})
 }
 
-// Exists returns true if a database entry exists.
+// Exists returns true if a database bucket exists.
 func Exists(db *bbolt.DB, path string) (bool, error) {
 	var okay bool
 	return okay, db.View(func(tx *bbolt.Tx) error {
@@ -31,7 +31,7 @@ func Exists(db *bbolt.DB, path string) (bool, error) {
 	})
 }
 
-// Get returns an existing database entry as a map.
+// Get returns an existing database bucket as a map.
 func Get(db *bbolt.DB, path string) (map[string]string, error) {
 	var bmap map[string]string
 	return bmap, db.View(func(tx *bbolt.Tx) error {
@@ -47,12 +47,12 @@ func Get(db *bbolt.DB, path string) (map[string]string, error) {
 	})
 }
 
-// Join returns a database entry path from dot-joined elements.
+// Join returns a database bucket path from dot-joined elements.
 func Join(elems ...string) string {
 	return strings.Join(elems, ".")
 }
 
-// List returns existing database entry paths containing a prefix.
+// List returns all existing database bucket paths containing a prefix.
 func List(db *bbolt.DB, pref string) ([]string, error) {
 	var paths []string
 	return paths, db.View(func(tx *bbolt.Tx) error {
@@ -66,7 +66,7 @@ func List(db *bbolt.DB, pref string) ([]string, error) {
 	})
 }
 
-// Set sets a new or existing database entry from a map.
+// Set sets a new or existing database bucket from a map.
 func Set(db *bbolt.DB, path string, bmap map[string]string) error {
 	return db.Update(func(tx *bbolt.Tx) error {
 		buck, err := tx.CreateBucketIfNotExists([]byte(path))

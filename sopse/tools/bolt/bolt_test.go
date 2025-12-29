@@ -51,12 +51,12 @@ func TestGet(t *testing.T) {
 	// setup
 	db := mock.DB(t)
 
-	// success - entry exists
+	// success - bucket exists
 	bmap, err := Get(db, "user.mockUser1")
 	assert.Equal(t, mock.Data["user.mockUser1"], bmap)
 	assert.NoError(t, err)
 
-	// success - entry does not exist
+	// success - bucket does not exist
 	bmap, err = Get(db, "nope")
 	assert.Nil(t, bmap)
 	assert.NoError(t, err)

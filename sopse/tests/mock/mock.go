@@ -32,8 +32,8 @@ func DB(t *testing.T) *bbolt.DB {
 	path := filepath.Join(dire, t.Name()+".db")
 	db, _ := bbolt.Open(path, 0600, nil)
 	db.Update(func(tx *bbolt.Tx) error {
-		for name, bmap := range Data {
-			buck, _ := tx.CreateBucketIfNotExists([]byte(name))
+		for path, bmap := range Data {
+			buck, _ := tx.CreateBucketIfNotExists([]byte(path))
 			for attr, data := range bmap {
 				buck.Put([]byte(attr), []byte(data))
 			}
