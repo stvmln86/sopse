@@ -31,12 +31,16 @@ func Exists(db *bbolt.DB, name string) (bool, error) {
 	})
 }
 
-// Get returns a value from an existing database entry.
-func Get(db *bbolt.DB, name, attr string) (string, error) {
-	var data string
-	return data, db.View(func(tx *bbolt.Tx) error {
+// Get returns an existing database entry as a map.
+func Get(db *bbolt.DB, name string) (map[string]string, error) {
+	var pairs map[string]string
+	return pairs, db.View(func(tx *bbolt.Tx) error {
 		if buck := tx.Bucket([]byte(name)); buck != nil {
-			data = string(buck.Get([]byte(attr)))
+			pairs = make(map[string]string)
+			return buck.ForEach(func(attr, data []byte) error {
+				pairs[string(attr)] = string(data)
+				return nil
+			})
 		}
 
 		return nil

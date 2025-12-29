@@ -54,9 +54,14 @@ func TestGet(t *testing.T) {
 	db := test.DB(t, false)
 	test.Set(t, db, "name", "attr", "data")
 
-	// success
-	data, err := Get(db, "name", "attr")
-	assert.Equal(t, "data", data)
+	// success - entry exists
+	pairs, err := Get(db, "name")
+	assert.Equal(t, map[string]string{"attr": "data"}, pairs)
+	assert.NoError(t, err)
+
+	// success - entry does not exist
+	pairs, err = Get(db, "nope")
+	assert.Nil(t, pairs)
 	assert.NoError(t, err)
 }
 
