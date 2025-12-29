@@ -1,6 +1,8 @@
 package app
 
 import (
+	"bytes"
+	"net/http/httptest"
 	"path/filepath"
 	"testing"
 
@@ -13,6 +15,15 @@ func mockApp(t *testing.T) *App {
 	conf := conf.Parse(nil)
 	db := mock.DB(t)
 	return New(conf, db)
+}
+
+func mockRun(t *testing.T, meth, path, body string) (*App, *httptest.ResponseRecorder) {
+	app := mockApp(t)
+	b := bytes.NewBufferString(body)
+	r := httptest.NewRequest(meth, path, b)
+	w := httptest.NewRecorder()
+	app.ServeMux().ServeHTTP(w, r)
+	return app, w
 }
 
 func TestNew(t *testing.T) {
@@ -51,6 +62,15 @@ func TestClose(t *testing.T) {
 	// confirm - database
 	_, err = app.DB.Begin(false)
 	assert.Error(t, err)
+}
+
+func TestServeMux(t *testing.T) {
+	// setup
+	app := mockApp(t)
+
+	// success
+	smux := app.ServeMux()
+	assert.NotNil(t, smux)
 }
 
 func TestStart(t *testing.T) {

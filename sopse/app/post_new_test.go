@@ -2,7 +2,6 @@ package app
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -11,13 +10,8 @@ import (
 )
 
 func TestPostNewUser(t *testing.T) {
-	// setup
-	app := mockApp(t)
-	r := httptest.NewRequest("GET", "/new", nil)
-	w := httptest.NewRecorder()
-
 	// success
-	app.PostNewUser(w, r)
+	app, w := mockRun(t, "POST", "/new", "")
 	body := w.Body.String()
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Regexp(t, `[\w-_]{22}`, body)

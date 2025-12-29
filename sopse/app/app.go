@@ -43,8 +43,8 @@ func (a *App) Close() error {
 	return nil
 }
 
-// Start starts the App's server.
-func (a *App) Start() error {
+// ServeMux returns the App's configured ServeMux.
+func (a *App) ServeMux() *http.ServeMux {
 	smux := http.NewServeMux()
 	for path, hand := range map[string]http.HandlerFunc{
 		"GET /":     a.GetIndexOr404,
@@ -53,9 +53,14 @@ func (a *App) Start() error {
 		smux.Handle(path, ware.Apply(hand, a.Conf.UserRate))
 	}
 
+	return smux
+}
+
+// Start starts the App's server.
+func (a *App) Start() error {
 	serv := &http.Server{
 		Addr:         a.Conf.Addr,
-		Handler:      smux,
+		Handler:      a.ServeMux(),
 		IdleTimeout:  60 * time.Second,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
