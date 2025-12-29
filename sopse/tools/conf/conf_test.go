@@ -14,6 +14,6 @@ func TestParse(t *testing.T) {
 	assert.Equal(t, "./sopse.db", conf.Dbse)
 	assert.Equal(t, int64(4096), conf.BodySize)
 	assert.Equal(t, 24*7*time.Hour, conf.PairLife)
-	assert.Equal(t, int64(1000), conf.UserRate)
-	assert.Equal(t, int64(256), conf.UserSize)
+	assert.Equal(t, 1000, conf.UserRate)
+	assert.Equal(t, 256, conf.UserSize)
 }

@@ -2,7 +2,6 @@ package ware
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -10,10 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
-
-func mockHandler(w http.ResponseWriter, _ *http.Request) {
-	fmt.Fprint(w, "body")
-}
 
 func TestLogWare(t *testing.T) {
 	// setup
@@ -24,7 +19,11 @@ func TestLogWare(t *testing.T) {
 	log.SetOutput(b)
 
 	// success
-	LogWare(http.HandlerFunc(mockHandler)).ServeHTTP(w, r)
+	hand := LogWare(http.HandlerFunc(mockHandler))
+	assert.NotNil(t, hand)
+
+	// confirm - handler
+	hand.ServeHTTP(w, r)
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "body", w.Body.String())
 

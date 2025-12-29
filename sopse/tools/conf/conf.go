@@ -12,8 +12,8 @@ type Conf struct {
 	Dbse     string
 	BodySize int64
 	PairLife time.Duration
-	UserRate int64
-	UserSize int64
+	UserRate int
+	UserSize int
 }
 
 // Parse returns a new Conf from parsed command-line arguments.
@@ -24,8 +24,8 @@ func Parse(elems []string) *Conf {
 	fset.StringVar(&conf.Dbse, "dbse", "./sopse.db", "database path")
 	fset.Int64Var(&conf.BodySize, "bodySize", 4096, "max request body size")
 	fset.DurationVar(&conf.PairLife, "pairLife", 24*7*time.Hour, "pair expiry time")
-	fset.Int64Var(&conf.UserRate, "userRate", 1000, "max requests per hour")
-	fset.Int64Var(&conf.UserSize, "userSize", 256, "max pairs per user")
+	fset.IntVar(&conf.UserRate, "userRate", 1000, "max requests per hour")
+	fset.IntVar(&conf.UserSize, "userSize", 256, "max pairs per user")
 	fset.Parse(elems)
 	return conf
 }

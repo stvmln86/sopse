@@ -6,6 +6,6 @@ import (
 )
 
 // Apply applies all middleware to a HandlerFunc.
-func Apply(next http.HandlerFunc) http.Handler {
-	return LogWare(http.HandlerFunc(next))
+func Apply(next http.HandlerFunc, rate int) http.Handler {
+	return LogWare(RateWare(http.HandlerFunc(next), rate))
 }
