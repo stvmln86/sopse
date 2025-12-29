@@ -1,6 +1,7 @@
 package neat
 
 import (
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -22,6 +23,15 @@ func TestExpired(t *testing.T) {
 	assert.False(t, okay)
 }
 
+func TestFrom(t *testing.T) {
+	// setup
+	r := httptest.NewRequest("GET", "/", nil)
+
+	// success
+	from := From(r)
+	assert.Equal(t, "192.0.2.1", from)
+}
+
 func TestTime(t *testing.T) {
 	// setup
 	failTime := time.Unix(0, 0).Local()
@@ -39,4 +49,10 @@ func TestUnix(t *testing.T) {
 	// success
 	unix := Unix(mockTime)
 	assert.Equal(t, "1000", unix)
+}
+
+func TestUUID(t *testing.T) {
+	// success
+	uuid := UUID()
+	assert.Len(t, uuid, 22)
 }

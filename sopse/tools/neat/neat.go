@@ -2,13 +2,24 @@
 package neat
 
 import (
+	"encoding/base64"
+	"net"
+	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // Expired returns true if a Time object is past a duration.
 func Expired(tobj time.Time, dura time.Duration) bool {
 	return time.Now().After(tobj.Add(dura))
+}
+
+// From returns the remote IP address from a Request.
+func From(r *http.Request) string {
+	host, _, _ := net.SplitHostPort(r.RemoteAddr)
+	return host
 }
 
 // Time returns a local Time object from a Unix UTC string.
@@ -24,4 +35,10 @@ func Time(unix string) time.Time {
 // Unix returns a Unix UTC string from a Time object.
 func Unix(tobj time.Time) string {
 	return strconv.FormatInt(tobj.Unix(), 10)
+}
+
+// UUID returns a base64-encoded random UUID.
+func UUID() string {
+	uuid := uuid.New()
+	return base64.RawURLEncoding.EncodeToString(uuid[:])
 }

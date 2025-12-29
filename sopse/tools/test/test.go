@@ -10,9 +10,9 @@ import (
 
 // MockData is a map of mock database data for unit testing.
 var MockData = map[string]map[string]string{
-	"user.mockUser1":       {"host": "1.1.1.1", "init": "1000"},
+	"user.mockUser1":       {"from": "1.1.1.1", "init": "1000"},
 	"pair.mockUser1.alpha": {"body": "Alpha.", "init": "1000"},
-	"pair.mockUser1.bravo": {"body": "Bravo.", "init": "1100"},
+	"pair.mockUser1.bravo": {"body": "Bravo.", "init": "1001"},
 }
 
 // DB returns a temporary database containing MockData.
