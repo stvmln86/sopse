@@ -8,10 +8,10 @@ import (
 
 func TestDB(t *testing.T) {
 	// success
-	db := DB(t)
+	db := DB(t, true)
 	assert.NotNil(t, db)
 
-	// confirm - mockData
+	// confirm - database
 	for name, pairs := range mockData {
 		for attr, want := range pairs {
 			data := Get(t, db, name, attr)
@@ -22,19 +22,22 @@ func TestDB(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	// setup
-	db := DB(t)
+	db := DB(t, false)
+	Set(t, db, "name", "attr", "data")
 
 	// success
-	data := Get(t, db, "user.mockUser1", "init")
-	assert.Equal(t, "1000", data)
+	data := Get(t, db, "name", "attr")
+	assert.Equal(t, "data", data)
 }
 
 func TestSet(t *testing.T) {
 	// setup
-	db := DB(t)
+	db := DB(t, false)
 
 	// success
 	Set(t, db, "name", "attr", "data")
+
+	// confirm - database
 	data := Get(t, db, "name", "attr")
 	assert.Equal(t, "data", data)
 }

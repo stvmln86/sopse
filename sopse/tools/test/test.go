@@ -16,16 +16,23 @@ var mockData = map[string]map[string]string{
 }
 
 // DB returns a temporary database containing mockData.
-func DB(t *testing.T) *bbolt.DB {
+func DB(t *testing.T, inits ...bool) *bbolt.DB {
 	dire := t.TempDir()
-	dest := filepath.Join(dire, "mock.db")
+	dest := filepath.Join(dire, t.Name()+".db")
 	db, err := bbolt.Open(dest, 0644, nil)
 	Try(t, err)
 
-	for name, pairs := range mockData {
-		for attr, data := range pairs {
-			Set(t, db, name, attr, data)
-		}
+	if len(inits) != 0 && inits[0] {
+		Try(t, db.Update(func(tx *bbolt.Tx) error {
+			for name, pairs := range mockData {
+				buck, _ := tx.CreateBucketIfNotExists([]byte(name))
+				for attr, data := range pairs {
+					buck.Put([]byte(attr), []byte(data))
+				}
+			}
+
+			return nil
+		}))
 	}
 
 	return db
@@ -35,7 +42,8 @@ func DB(t *testing.T) *bbolt.DB {
 func Get(t *testing.T, db *bbolt.DB, name, attr string) string {
 	var data string
 	Try(t, db.View(func(tx *bbolt.Tx) error {
-		data = string(tx.Bucket([]byte(name)).Get([]byte(attr)))
+		buck := tx.Bucket([]byte(name))
+		data = string(buck.Get([]byte(attr)))
 		return nil
 	}))
 
