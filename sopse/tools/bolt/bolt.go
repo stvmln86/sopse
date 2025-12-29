@@ -33,12 +33,12 @@ func Exists(db *bbolt.DB, name string) (bool, error) {
 
 // Get returns an existing database entry as a map.
 func Get(db *bbolt.DB, name string) (map[string]string, error) {
-	var pairs map[string]string
-	return pairs, db.View(func(tx *bbolt.Tx) error {
+	var bmap map[string]string
+	return bmap, db.View(func(tx *bbolt.Tx) error {
 		if buck := tx.Bucket([]byte(name)); buck != nil {
-			pairs = make(map[string]string)
+			bmap = make(map[string]string)
 			return buck.ForEach(func(attr, data []byte) error {
-				pairs[string(attr)] = string(data)
+				bmap[string(attr)] = string(data)
 				return nil
 			})
 		}
@@ -47,7 +47,7 @@ func Get(db *bbolt.DB, name string) (map[string]string, error) {
 	})
 }
 
-// Join returns a database entry name from a kind and one or more elements.
+// Join returns a database entry name from two or more elements.
 func Join(kind, head string, elems ...string) string {
 	elems = append([]string{kind, head}, elems...)
 	return strings.Join(elems, ".")
@@ -65,14 +65,14 @@ func List(db *bbolt.DB, pref string) ([]string, error) {
 }
 
 // Set sets a new or existing database entry from a map.
-func Set(db *bbolt.DB, name string, pairs map[string]string) error {
+func Set(db *bbolt.DB, name string, bmap map[string]string) error {
 	return db.Update(func(tx *bbolt.Tx) error {
 		buck, err := tx.CreateBucketIfNotExists([]byte(name))
 		if err != nil {
 			return err
 		}
 
-		for attr, data := range pairs {
+		for attr, data := range bmap {
 			if err := buck.Put([]byte(attr), []byte(data)); err != nil {
 				return err
 			}

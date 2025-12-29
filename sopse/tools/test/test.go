@@ -10,73 +10,36 @@ import (
 
 // mockData is a map of mock database data for unit testing.
 var mockData = map[string]map[string]string{
-	"user.mockUser1":       {"addr": "1.1.1.1", "init": "1000"},
-	"pair.mockUser1.alpha": {"body": "Alpha.", "init": "1000"},
-	"pair.mockUser1.bravo": {"body": "Bravo.", "init": "1100"},
+	"user.mockUser1":       {"hash": "mockUser", "addr": "1.1.1.1", "init": "1000"},
+	"pair.mockUser1.alpha": {"name": "alpha", "body": "Alpha.", "init": "1000"},
+	"pair.mockUser1.bravo": {"name": "bravo", "body": "Bravo.", "init": "1100"},
 }
 
 // DB returns a temporary database containing mockData.
-func DB(t *testing.T, init bool) *bbolt.DB {
+func DB(t *testing.T) *bbolt.DB {
 	dire := t.TempDir()
 	dest := filepath.Join(dire, t.Name()+".db")
 	db, err := bbolt.Open(dest, 0644, nil)
 	Try(t, err)
 
-	if init {
-		Try(t, db.Update(func(tx *bbolt.Tx) error {
-			for name, pairs := range mockData {
-				buck, err := tx.CreateBucketIfNotExists([]byte(name))
-				if err != nil {
-					return err
-				}
-
-				for attr, data := range pairs {
-					if err := buck.Put([]byte(attr), []byte(data)); err != nil {
-						return err
-					}
-				}
+	Try(t, db.Update(func(tx *bbolt.Tx) error {
+		for name, bmap := range mockData {
+			buck, err := tx.CreateBucketIfNotExists([]byte(name))
+			if err != nil {
+				return err
 			}
 
-			return nil
-		}))
-	}
-
-	return db
-}
-
-// Exists returns true if a database entry exists.
-func Exists(t *testing.T, db *bbolt.DB, name string) bool {
-	var okay bool
-	Try(t, db.View(func(tx *bbolt.Tx) error {
-		okay = tx.Bucket([]byte(name)) != nil
-		return nil
-	}))
-
-	return okay
-}
-
-// Get returns a database value.
-func Get(t *testing.T, db *bbolt.DB, name, attr string) string {
-	var data string
-	Try(t, db.View(func(tx *bbolt.Tx) error {
-		buck := tx.Bucket([]byte(name))
-		data = string(buck.Get([]byte(attr)))
-		return nil
-	}))
-
-	return data
-}
-
-// Set sets a new or existing database value.
-func Set(t *testing.T, db *bbolt.DB, name, attr, data string) {
-	Try(t, db.Batch(func(tx *bbolt.Tx) error {
-		buck, err := tx.CreateBucketIfNotExists([]byte(name))
-		if err != nil {
-			return err
+			for attr, data := range bmap {
+				if err := buck.Put([]byte(attr), []byte(data)); err != nil {
+					return err
+				}
+			}
 		}
 
-		return buck.Put([]byte(attr), []byte(data))
+		return nil
 	}))
+
+	return db
 }
 
 // Try fails a test on a non-nil error.

@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stvmln86/sopse/sopse/tools/test"
+	"go.etcd.io/bbolt"
 )
 
 func TestConnect(t *testing.T) {
@@ -21,25 +22,26 @@ func TestConnect(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	// setup
-	db := test.DB(t, false)
-	test.Set(t, db, "name", "attr", "data")
+	db := test.DB(t)
 
 	// success
-	err := Delete(db, "name")
+	err := Delete(db, "user.mockUser1")
 	assert.NoError(t, err)
 
 	// confirm - database
-	okay := test.Exists(t, db, "name")
-	assert.False(t, okay)
+	test.Try(t, db.View(func(tx *bbolt.Tx) error {
+		buck := tx.Bucket([]byte("user.mockUser1"))
+		assert.Nil(t, buck)
+		return nil
+	}))
 }
 
 func TestExists(t *testing.T) {
 	// setup
-	db := test.DB(t, false)
-	test.Set(t, db, "name", "attr", "data")
+	db := test.DB(t)
 
 	// success - true
-	okay, err := Exists(db, "name")
+	okay, err := Exists(db, "user.mockUser1")
 	assert.True(t, okay)
 	assert.NoError(t, err)
 
@@ -51,17 +53,20 @@ func TestExists(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	// setup
-	db := test.DB(t, false)
-	test.Set(t, db, "name", "attr", "data")
+	db := test.DB(t)
 
 	// success - entry exists
-	pairs, err := Get(db, "name")
-	assert.Equal(t, map[string]string{"attr": "data"}, pairs)
+	bmap, err := Get(db, "user.mockUser1")
+	assert.Equal(t, map[string]string{
+		"hash": "mockUser1",
+		"addr": "1.1.1.1",
+		"init": "1000",
+	}, bmap)
 	assert.NoError(t, err)
 
 	// success - entry does not exist
-	pairs, err = Get(db, "nope")
-	assert.Nil(t, pairs)
+	bmap, err = Get(db, "nope")
+	assert.Nil(t, bmap)
 	assert.NoError(t, err)
 }
 
@@ -77,25 +82,30 @@ func TestJoin(t *testing.T) {
 
 func TestList(t *testing.T) {
 	// setup
-	db := test.DB(t, false)
-	test.Set(t, db, "name1", "attr", "data")
-	test.Set(t, db, "name2", "attr", "data")
+	db := test.DB(t)
 
 	// success
-	names, err := List(db, "name")
-	assert.Equal(t, []string{"name1", "name2"}, names)
+	names, err := List(db, "pair.mockUser1")
+	assert.Equal(t, []string{
+		"pair.mockUser1.alpha",
+		"pair.mockUser1.bravo",
+	}, names)
 	assert.NoError(t, err)
 }
 
 func TestSet(t *testing.T) {
 	// setup
-	db := test.DB(t, false)
+	db := test.DB(t)
 
 	// success
 	err := Set(db, "name", map[string]string{"attr": "data"})
 	assert.NoError(t, err)
 
 	// confirm - database
-	data := test.Get(t, db, "name", "attr")
-	assert.Equal(t, "data", data)
+	test.Try(t, db.View(func(tx *bbolt.Tx) error {
+		buck := tx.Bucket([]byte("name"))
+		data := string(buck.Get([]byte("attr")))
+		assert.Equal(t, "data", data)
+		return nil
+	}))
 }
