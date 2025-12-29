@@ -11,7 +11,7 @@ import (
 
 func TestPostNewUser(t *testing.T) {
 	// success
-	app, w := mockRun(t, "POST", "/new", "")
+	app, w := mockRun(t, "POST", "/api/new", "")
 	body := w.Body.String()
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Regexp(t, `[\w-_]{22}`, body)

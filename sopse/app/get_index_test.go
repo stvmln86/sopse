@@ -16,5 +16,5 @@ func TestGetIndexOr404(t *testing.T) {
 	// failure - not found
 	_, w = mockRun(t, "GET", "/nope", "")
 	assert.Equal(t, http.StatusNotFound, w.Code)
-	assert.Equal(t, "error 404: not found", w.Body.String())
+	assert.Equal(t, "error 404: url not found", w.Body.String())
 }

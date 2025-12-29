@@ -47,10 +47,10 @@ func (a *App) Close() error {
 func (a *App) ServeMux() *http.ServeMux {
 	smux := http.NewServeMux()
 	for path, hand := range map[string]http.HandlerFunc{
-		"GET /":               a.GetIndexOr404,
-		"GET /{uuid}":         a.GetUser,
-		"POST /new":           a.PostNewUser,
-		"POST /{uuid}/{name}": a.PostPair,
+		"GET /":                   a.GetIndexOr404,
+		"GET /api/{uuid}":         a.GetUser,
+		"POST /api/new":           a.PostNewUser,
+		"POST /api/{uuid}/{name}": a.PostPair,
 	} {
 		smux.Handle(path, ware.Apply(hand, a.Conf.UserRate))
 	}

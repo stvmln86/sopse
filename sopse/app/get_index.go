@@ -27,7 +27,7 @@ var Uptime = time.Now()
 // GetIndexOr404 returns the index page or a Not Found error.
 func (a *App) GetIndexOr404(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		prot.WriteError(w, http.StatusNotFound)
+		prot.WriteError(w, http.StatusNotFound, "url not found")
 		return
 	}
 

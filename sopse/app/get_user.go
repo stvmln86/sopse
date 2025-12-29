@@ -14,7 +14,7 @@ func (a *App) GetUser(w http.ResponseWriter, r *http.Request) {
 	user, err := user.Get(a.DB, uuid)
 	switch {
 	case user == nil:
-		prot.WriteError(w, http.StatusNotFound)
+		prot.WriteError(w, http.StatusNotFound, "user not found")
 		return
 	case err != nil:
 		prot.WriteError(w, http.StatusInternalServerError)

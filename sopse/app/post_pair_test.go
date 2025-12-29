@@ -11,7 +11,7 @@ import (
 
 func TestPostPair(t *testing.T) {
 	// success
-	app, w := mockRun(t, "POST", "/mockUser1/name", "body")
+	app, w := mockRun(t, "POST", "/api/mockUser1/name", "body")
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Equal(t, "ok", w.Body.String())
 
@@ -22,7 +22,7 @@ func TestPostPair(t *testing.T) {
 	assert.NoError(t, err)
 
 	// failure - not found
-	_, w = mockRun(t, "POST", "/nope/name", "body")
+	_, w = mockRun(t, "POST", "/api/nope/name", "body")
 	assert.Equal(t, http.StatusNotFound, w.Code)
-	assert.Equal(t, "error 404: not found", w.Body.String())
+	assert.Equal(t, "error 404: user not found", w.Body.String())
 }
