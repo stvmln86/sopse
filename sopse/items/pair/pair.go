@@ -3,7 +3,6 @@ package pair
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/stvmln86/sopse/sopse/tools/bolt"
@@ -74,8 +73,8 @@ func (p *Pair) Map() map[string]string {
 
 // Name returns the Pair's path name.
 func (p *Pair) Name() string {
-	elems := strings.Split(p.Path, ".")
-	return elems[len(elems)-1]
+	_, _, name := bolt.Split(p.Path)
+	return name
 }
 
 // Update overwrites the Pair with a new body.

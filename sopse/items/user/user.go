@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/stvmln86/sopse/sopse/items/pair"
@@ -105,6 +104,6 @@ func (u *User) SetPair(name, body string) (*pair.Pair, error) {
 
 // UUID returns the User's path UUID.
 func (u *User) UUID() string {
-	elems := strings.Split(u.Path, ".")
-	return elems[len(elems)-1]
+	_, uuid, _ := bolt.Split(u.Path)
+	return uuid
 }
