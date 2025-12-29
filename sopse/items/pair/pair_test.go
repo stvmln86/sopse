@@ -83,6 +83,15 @@ func TestDelete(t *testing.T) {
 	}))
 }
 
+func TestExpired(t *testing.T) {
+	// setup
+	pair := mockPair(t)
+
+	// success
+	okay := pair.Expired(1 * time.Second)
+	assert.True(t, okay)
+}
+
 func TestMap(t *testing.T) {
 	// setup
 	pair := mockPair(t)
