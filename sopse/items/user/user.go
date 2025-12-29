@@ -66,7 +66,7 @@ func (u *User) GetPair(name string) (*pair.Pair, error) {
 	return pair.Get(u.DB, u.UUID(), name)
 }
 
-// ListPairs returns the paths of all the User's existing Pairs.
+// ListPairs returns the User's existing Pair paths.
 func (u *User) ListPairs() ([]string, error) {
 	pref := bolt.Join("pair", u.UUID())
 	paths, err := bolt.List(u.DB, pref)
@@ -90,7 +90,7 @@ func (u *User) SetPair(name, body string) (*pair.Pair, error) {
 	return pair.Set(u.DB, u.UUID(), name, body)
 }
 
-// UUID returns the User's base name UUID.
+// UUID returns the User's path UUID.
 func (u *User) UUID() string {
 	elems := strings.Split(u.Path, ".")
 	return elems[len(elems)-1]

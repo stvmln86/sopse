@@ -72,7 +72,7 @@ func (p *Pair) Map() map[string]string {
 	}
 }
 
-// Name returns the Pair's base name.
+// Name returns the Pair's path name.
 func (p *Pair) Name() string {
 	elems := strings.Split(p.Path, ".")
 	return elems[len(elems)-1]

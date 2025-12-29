@@ -37,7 +37,7 @@ func Unix(tobj time.Time) string {
 	return strconv.FormatInt(tobj.Unix(), 10)
 }
 
-// UUID returns a base64-encoded random UUID.
+// UUID returns a new base64-encoded UUID string.
 func UUID() string {
 	uuid := uuid.New()
 	return base64.RawURLEncoding.EncodeToString(uuid[:])
