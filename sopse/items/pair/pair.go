@@ -25,7 +25,8 @@ func New(db *bbolt.DB, addr, body string, init time.Time) *Pair {
 }
 
 // Get returns an existing Pair or nil.
-func Get(db *bbolt.DB, addr string) (*Pair, error) {
+func Get(db *bbolt.DB, hash, name string) (*Pair, error) {
+	addr := bolt.Join("pair", hash, name)
 	bmap, err := bolt.Get(db, addr)
 	switch {
 	case bmap == nil:
@@ -39,7 +40,8 @@ func Get(db *bbolt.DB, addr string) (*Pair, error) {
 }
 
 // Set sets and returns a new or existing Pair.
-func Set(db *bbolt.DB, addr, body string, init time.Time) (*Pair, error) {
+func Set(db *bbolt.DB, hash, name, body string, init time.Time) (*Pair, error) {
+	addr := bolt.Join("pair", hash, name)
 	pair := New(db, addr, body, init)
 	if err := bolt.Set(db, addr, pair.Map()); err != nil {
 		return nil, fmt.Errorf("cannot set Pair %q - %w", addr, err)

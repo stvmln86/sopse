@@ -13,7 +13,7 @@ var time1000 = time.Unix(1000, 0).Local()
 
 func mockPair(t *testing.T) *Pair {
 	db := test.DB(t)
-	pair, err := Get(db, "pair.mockUser1.alpha")
+	pair, err := Get(db, "mockUser1", "alpha")
 	test.Try(t, err)
 	return pair
 }
@@ -35,7 +35,7 @@ func TestGet(t *testing.T) {
 	db := test.DB(t)
 
 	// success
-	pair, err := Get(db, "pair.mockUser1.alpha")
+	pair, err := Get(db, "mockUser1", "alpha")
 	assert.Equal(t, db, pair.DB)
 	assert.Equal(t, "pair.mockUser1.alpha", pair.Addr)
 	assert.Equal(t, "Alpha.", pair.Body)
@@ -48,7 +48,7 @@ func TestSet(t *testing.T) {
 	db := test.DB(t)
 
 	// success
-	pair, err := Set(db, "pair.mockUser1.alpha", "body", time1000)
+	pair, err := Set(db, "mockUser1", "alpha", "body", time1000)
 	assert.Equal(t, db, pair.DB)
 	assert.Equal(t, "pair.mockUser1.alpha", pair.Addr)
 	assert.Equal(t, "body", pair.Body)
