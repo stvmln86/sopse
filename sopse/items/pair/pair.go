@@ -24,7 +24,7 @@ func New(db *bbolt.DB, addr, body string, init time.Time) *Pair {
 	return &Pair{db, addr, body, init}
 }
 
-// Get returns an existing Pair.
+// Get returns an existing Pair or nil.
 func Get(db *bbolt.DB, addr string) (*Pair, error) {
 	bmap, err := bolt.Get(db, addr)
 	switch {
@@ -74,5 +74,9 @@ func (p *Pair) Name() string {
 // Update overwrites the Pair with a new body.
 func (p *Pair) Update(body string) error {
 	p.Body = body
-	return bolt.Set(p.DB, p.Addr, p.Map())
+	if err := bolt.Set(p.DB, p.Addr, p.Map()); err != nil {
+		return fmt.Errorf("cannot update Pair %q - %w", p.Addr, err)
+	}
+
+	return nil
 }
