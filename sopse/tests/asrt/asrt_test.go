@@ -2,6 +2,7 @@ package asrt
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stvmln86/sopse/sopse/tests/mock"
 )
@@ -20,4 +21,12 @@ func TestNoBucket(t *testing.T) {
 
 	// success
 	NoBucket(t, db, "nope")
+}
+
+func TestTimeNow(t *testing.T) {
+	// setup
+	tobj := time.Now().Add(-1 * time.Second)
+
+	// success - true
+	TimeNow(t, tobj)
 }

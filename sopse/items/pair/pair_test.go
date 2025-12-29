@@ -51,7 +51,7 @@ func TestSet(t *testing.T) {
 	assert.Equal(t, db, pair.DB)
 	assert.Equal(t, "pair.mockUser1.alpha", pair.Path)
 	assert.Equal(t, "body", pair.Body)
-	assert.WithinDuration(t, time.Now(), pair.Init, 5*time.Second)
+	asrt.TimeNow(t, pair.Init)
 	assert.NoError(t, err)
 
 	// confirm - database

@@ -3,6 +3,7 @@ package asrt
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"go.etcd.io/bbolt"
@@ -30,4 +31,9 @@ func NoBucket(t *testing.T, db *bbolt.DB, path string) {
 		assert.Nil(t, buck)
 		return nil
 	})
+}
+
+// TimeNow asserts a Time object is within ten seconds of now.
+func TimeNow(t *testing.T, tobj time.Time) {
+	assert.WithinDuration(t, time.Now(), tobj, 10*time.Second)
 }

@@ -3,10 +3,10 @@ package app
 import (
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stvmln86/sopse/sopse/items/user"
+	"github.com/stvmln86/sopse/sopse/tests/asrt"
 )
 
 func TestPostNewUser(t *testing.T) {
@@ -19,6 +19,6 @@ func TestPostNewUser(t *testing.T) {
 	// confirm - database
 	user, err := user.Get(app.DB, body)
 	assert.Equal(t, "192.0.2.1", user.Addr)
-	assert.WithinDuration(t, time.Now(), user.Init, 5*time.Second)
+	asrt.TimeNow(t, user.Init)
 	assert.NoError(t, err)
 }
