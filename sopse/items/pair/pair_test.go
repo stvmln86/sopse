@@ -48,11 +48,11 @@ func TestSet(t *testing.T) {
 	db := test.DB(t)
 
 	// success
-	pair, err := Set(db, "mockUser1", "alpha", "body", mockTime)
+	pair, err := Set(db, "mockUser1", "alpha", "body")
 	assert.Equal(t, db, pair.DB)
 	assert.Equal(t, "pair.mockUser1.alpha", pair.Addr)
 	assert.Equal(t, "body", pair.Body)
-	assert.Equal(t, mockTime, pair.Init)
+	assert.WithinDuration(t, time.Now(), pair.Init, 1*time.Second)
 	assert.NoError(t, err)
 
 	// confirm - database
