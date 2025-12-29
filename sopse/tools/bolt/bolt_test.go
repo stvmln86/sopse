@@ -67,13 +67,9 @@ func TestGet(t *testing.T) {
 }
 
 func TestJoin(t *testing.T) {
-	// success - two elements
-	name := Join("head", "kind")
-	assert.Equal(t, "head.kind", name)
-
-	// success - three elements
-	name = Join("head", "kind", "elem")
-	assert.Equal(t, "head.kind.elem", name)
+	// success
+	name := Join("head", "elem")
+	assert.Equal(t, "head.elem", name)
 }
 
 func TestList(t *testing.T) {

@@ -47,9 +47,9 @@ func Get(db *bbolt.DB, name string) (map[string]string, error) {
 	})
 }
 
-// Join returns a database entry name from two or more elements.
-func Join(kind, head string, elems ...string) string {
-	elems = append([]string{kind, head}, elems...)
+// Join returns a database entry name from one or more elements.
+func Join(head string, elems ...string) string {
+	elems = append([]string{head}, elems...)
 	return strings.Join(elems, ".")
 }
 
