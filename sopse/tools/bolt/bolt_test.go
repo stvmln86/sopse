@@ -68,8 +68,8 @@ func TestGet(t *testing.T) {
 
 func TestJoin(t *testing.T) {
 	// success
-	addr := Join("head", "elem")
-	assert.Equal(t, "head.elem", addr)
+	addr := Join("user", "mockUser1")
+	assert.Equal(t, "user.mockUser1", addr)
 }
 
 func TestList(t *testing.T) {

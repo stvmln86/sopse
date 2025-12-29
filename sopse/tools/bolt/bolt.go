@@ -47,9 +47,8 @@ func Get(db *bbolt.DB, addr string) (map[string]string, error) {
 	})
 }
 
-// Join returns a database entry address from one or more elements.
-func Join(head string, elems ...string) string {
-	elems = append([]string{head}, elems...)
+// Join returns a database entry address from dot-joined elements.
+func Join(elems ...string) string {
 	return strings.Join(elems, ".")
 }
 
