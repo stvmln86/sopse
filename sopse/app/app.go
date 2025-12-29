@@ -47,7 +47,8 @@ func (a *App) Close() error {
 func (a *App) Start() error {
 	smux := http.NewServeMux()
 	for path, hand := range map[string]http.HandlerFunc{
-		"GET /": a.GetIndexOr404,
+		"GET /":     a.GetIndexOr404,
+		"POST /new": a.PostNewUser,
 	} {
 		smux.Handle(path, ware.Apply(hand, a.Conf.UserRate))
 	}

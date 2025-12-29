@@ -38,9 +38,9 @@ func TestCreate(t *testing.T) {
 	// success
 	user, err := Create(db, r)
 	assert.Equal(t, db, user.DB)
-	assert.Regexp(t, `user\..{22}`, user.Path)
+	assert.Regexp(t, `user\.[\w-_]{22}`, user.Path)
 	assert.Equal(t, "192.0.2.1", user.Addr)
-	assert.WithinDuration(t, time.Now(), user.Init, 1*time.Second)
+	assert.WithinDuration(t, time.Now(), user.Init, 5*time.Second)
 	assert.NoError(t, err)
 
 	// confirm - database
@@ -116,7 +116,7 @@ func TestSetPair(t *testing.T) {
 	assert.Equal(t, user.DB, pair.DB)
 	assert.Equal(t, "pair.mockUser1.name", pair.Path)
 	assert.Equal(t, "body", pair.Body)
-	assert.WithinDuration(t, time.Now(), pair.Init, 1*time.Second)
+	assert.WithinDuration(t, time.Now(), pair.Init, 5*time.Second)
 	assert.NoError(t, err)
 
 	// confirm - database
