@@ -83,3 +83,10 @@ func Set(db *bbolt.DB, path string, bmap map[string]string) error {
 		return nil
 	})
 }
+
+// Split returns the elements of a dot-joined database bucket path.
+func Split(path string) (string, string, string) {
+	elems := strings.SplitN(path, ".", 3)
+	elems = append(elems, "", "", "")
+	return elems[0], elems[1], elems[2]
+}

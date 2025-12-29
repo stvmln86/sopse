@@ -64,8 +64,8 @@ func TestGet(t *testing.T) {
 
 func TestJoin(t *testing.T) {
 	// success
-	path := Join("user", "mockUser1")
-	assert.Equal(t, "user.mockUser1", path)
+	path := Join("user", "mockUser1", "alpha")
+	assert.Equal(t, "user.mockUser1.alpha", path)
 }
 
 func TestList(t *testing.T) {
@@ -91,4 +91,12 @@ func TestSet(t *testing.T) {
 
 	// confirm - database
 	asrt.Bucket(t, db, "path", map[string]string{"attr": "data"})
+}
+
+func TestSplit(t *testing.T) {
+	// success
+	head, uuid, name := Split("user.mockUser1.alpha")
+	assert.Equal(t, "user", head)
+	assert.Equal(t, "mockUser1", uuid)
+	assert.Equal(t, "alpha", name)
 }
