@@ -20,3 +20,8 @@ func Time(unix string) time.Time {
 
 	return time.Unix(uint, 0).Local()
 }
+
+// Unix returns a Unix UTC string from a Time object.
+func Unix(tobj time.Time) string {
+	return strconv.FormatInt(tobj.Unix(), 10)
+}

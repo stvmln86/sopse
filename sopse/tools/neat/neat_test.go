@@ -22,14 +22,23 @@ func TestExpired(t *testing.T) {
 
 func TestTime(t *testing.T) {
 	// setup
-	want := time.Unix(100, 0).Local()
+	want := time.Unix(1000, 0).Local()
 	fail := time.Unix(0, 0).Local()
 
 	// success - valid time
-	tobj := Time("100")
+	tobj := Time("1000")
 	assert.Equal(t, want, tobj)
 
 	// failure - invalid time
 	tobj = Time("")
 	assert.Equal(t, fail, tobj)
+}
+
+func TestUnix(t *testing.T) {
+	// setup
+	tobj := time.Unix(1000, 0).Local()
+
+	// success
+	unix := Unix(tobj)
+	assert.Equal(t, "1000", unix)
 }
