@@ -47,8 +47,8 @@ func TestSet(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	okay := test.Get(t, db, "select exists (select 1 from Pairs where id=3)")
-	assert.NotZero(t, okay)
+	name := test.Get(t, db, "select name from Pairs where id=3")
+	assert.Equal(t, "name", name)
 
 	// success - existing pair
 	pair, err = Set(db, 1, "alpha", "body")
