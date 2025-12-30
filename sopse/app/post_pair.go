@@ -32,10 +32,10 @@ func (a *App) PostPair(w http.ResponseWriter, r *http.Request) {
 		if err := pair.Update(body); err != nil {
 			prot.WriteError(w, http.StatusInternalServerError)
 			return
-		} else {
-			prot.Write(w, http.StatusCreated, "ok")
-			return
 		}
+
+		prot.Write(w, http.StatusCreated, "ok")
+		return
 	}
 
 	size, err := user.Size()
