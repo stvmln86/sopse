@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
-	"github.com/stvmln86/sopse/sopse/tools/test"
+	"github.com/stvmln86/sopse/sopse/tests/asrt"
 )
 
 func TestPragma(t *testing.T) {
@@ -18,10 +18,7 @@ func TestPragma(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	var okay bool
-	err = db.Get(&okay, "pragma foreign_keys")
-	assert.True(t, okay)
-	assert.NoError(t, err)
+	asrt.Row(t, db, "pragma foreign_keys", 1)
 }
 
 func TestSchema(t *testing.T) {
@@ -33,10 +30,7 @@ func TestSchema(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	var size int
-	err = db.Get(&size, "select count(*) from SQLITE_SCHEMA")
-	assert.NotZero(t, size)
-	assert.NoError(t, err)
+	asrt.Row(t, db, "select count(*) from SQLITE_SCHEMA", 5)
 }
 
 func TestConnect(t *testing.T) {
@@ -50,18 +44,15 @@ func TestConnect(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	var size int
-	err = db.Get(&size, "select count(*) from SQLITE_SCHEMA")
-	assert.NotZero(t, size)
-	assert.NoError(t, err)
+	asrt.Row(t, db, "select count(*) from SQLITE_SCHEMA", 1)
 
 	// error - file does not exist
 	db, err = Connect("/nope.db", "")
 	assert.Nil(t, db)
-	test.AssertError(t, err, `cannot connect database "/nope.db" - %s`, fileErr)
+	asrt.Error(t, err, `cannot connect database "/nope.db" - %s`, fileErr)
 
 	// error - bad schema
 	db, err = Connect(":memory:", "nope")
 	assert.Nil(t, db)
-	test.AssertError(t, err, `cannot connect database ":memory:" - %s`, textErr)
+	asrt.Error(t, err, `cannot connect database ":memory:" - %s`, textErr)
 }
