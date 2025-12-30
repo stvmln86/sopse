@@ -6,7 +6,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
-	"github.com/stvmln86/sopse/sopse/tools/test"
 )
 
 func TestPragma(t *testing.T) {
@@ -18,8 +17,10 @@ func TestPragma(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	okay := test.Get(t, db, "pragma foreign_keys")
-	assert.NotZero(t, okay)
+	var okay bool
+	err = db.Get(&okay, "pragma foreign_keys")
+	assert.True(t, okay)
+	assert.NoError(t, err)
 }
 
 func TestSchema(t *testing.T) {
@@ -31,8 +32,10 @@ func TestSchema(t *testing.T) {
 	assert.NoError(t, err)
 
 	// confirm - database
-	size := test.Get(t, db, "select count(*) from SQLITE_SCHEMA")
+	var size int
+	err = db.Get(&size, "select count(*) from SQLITE_SCHEMA")
 	assert.NotZero(t, size)
+	assert.NoError(t, err)
 }
 
 func TestConnect(t *testing.T) {
