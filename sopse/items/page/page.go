@@ -10,7 +10,7 @@ import (
 	"github.com/stvmln86/sopse/sopse/tools/neat"
 )
 
-// Page is a single historical version of a Note.
+// Page is a single historical version of a recorded note.
 type Page struct {
 	db   *sqlx.DB
 	ID   int64  `db:"id"`
@@ -37,7 +37,7 @@ func Create(db *sqlx.DB, note int64, body string) (*Page, error) {
 	return page, nil
 }
 
-// Latest returns the latest Page for a Note.
+// Latest returns the latest Page for an existing Note.
 func Latest(db *sqlx.DB, note int64) (*Page, error) {
 	page := &Page{db: db}
 	err := db.Get(page, latest, note)
