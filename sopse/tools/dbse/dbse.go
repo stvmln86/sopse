@@ -44,11 +44,11 @@ const Schema = `
 func Connect(path, code string) (*sqlx.DB, error) {
 	db, err := sqlx.Connect("sqlite3", path)
 	if err != nil {
-		return nil, fmt.Errorf("cannot connect database %q - %w", path, err)
+		return nil, fmt.Errorf("cannot connect database - %w", err)
 	}
 
 	if _, err := db.Exec(code); err != nil {
-		return nil, fmt.Errorf("cannot connect database %q - %w", path, err)
+		return nil, fmt.Errorf("cannot connect database - %w", err)
 	}
 
 	return db, nil

@@ -46,13 +46,13 @@ func TestConnect(t *testing.T) {
 	// confirm - database
 	asrt.Row(t, db, "select count(*) from SQLITE_SCHEMA", 1)
 
-	// error - file does not exist
+	// error - file error
 	db, err = Connect("/nope.db", "")
 	assert.Nil(t, db)
-	asrt.Error(t, err, `cannot connect database "/nope.db" - %s`, fileErr)
+	asrt.Error(t, err, `cannot connect database - %s`, fileErr)
 
-	// error - bad schema
+	// error - database error
 	db, err = Connect(":memory:", "nope")
 	assert.Nil(t, db)
-	asrt.Error(t, err, `cannot connect database ":memory:" - %s`, textErr)
+	asrt.Error(t, err, `cannot connect database - %s`, textErr)
 }
