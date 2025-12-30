@@ -16,8 +16,7 @@ func mockApp(t *testing.T) *App {
 	return New(conf, db)
 }
 
-func mockRun(t *testing.T, meth, path, body string) (*App, *httptest.ResponseRecorder) {
-	app := mockApp(t)
+func mockRun(t *testing.T, app *App, meth, path, body string) (*App, *httptest.ResponseRecorder) {
 	b := bytes.NewBufferString(body)
 	r := httptest.NewRequest(meth, path, b)
 	w := httptest.NewRecorder()

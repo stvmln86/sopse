@@ -33,6 +33,11 @@ const (
 		where Users.id=? order by name asc
 	`
 
+	selectSize = `
+		select count(*) from Pairs join Users on Pairs.user = Users.id
+		where Users.id=? order by name asc
+	`
+
 	selectUser = `
 		select * from Users where uuid=? limit 1
 	`
@@ -70,6 +75,11 @@ func (u *User) Delete() error {
 	return err
 }
 
+// AddPair creates and returns a new Pair from the User.
+func (u *User) AddPair(name, body string) (*pair.Pair, error) {
+	return pair.Create(u.DB, u.ID, name, body)
+}
+
 // GetPair returns an existing Pair from the User.
 func (u *User) GetPair(name string) (*pair.Pair, error) {
 	return pair.Get(u.DB, u.ID, name)
@@ -86,7 +96,12 @@ func (u *User) ListPairs() ([]string, error) {
 	return names, nil
 }
 
-// SetPair sets and returns a new or existing Pair from the User.
-func (u *User) SetPair(name, body string) (*pair.Pair, error) {
-	return pair.Set(u.DB, u.ID, name, body)
+// Size returns the number of Pairs owned by the User.
+func (u *User) Size() (int64, error) {
+	var size int64
+	if err := u.DB.Get(&size, selectSize, u.ID); err != nil {
+		return 0, err
+	}
+
+	return size, nil
 }

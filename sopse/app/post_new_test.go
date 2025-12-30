@@ -9,8 +9,11 @@ import (
 )
 
 func TestPostNewUser(t *testing.T) {
+	// setup
+	app := mockApp(t)
+
 	// success
-	app, w := mockRun(t, "POST", "/api/new", "")
+	app, w := mockRun(t, app, "POST", "/api/new", "")
 	body := w.Body.String()
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Regexp(t, `\w{32}`, body)

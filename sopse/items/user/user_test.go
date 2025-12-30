@@ -48,6 +48,21 @@ func TestGet(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestAddPair(t *testing.T) {
+	// setup
+	db := test.DB()
+	user, _ := Get(db, "mockUser")
+
+	// success
+	pair, err := user.AddPair("name", "body")
+	assert.Equal(t, "name", pair.Name)
+	assert.NoError(t, err)
+
+	// confirm - database
+	name := test.Get(t, db, "select name from Pairs where id=3")
+	assert.Equal(t, "name", name)
+}
+
 func TestDelete(t *testing.T) {
 	// setup
 	db := test.DB()
@@ -84,17 +99,13 @@ func TestListPairs(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestSetPair(t *testing.T) {
+func TestSize(t *testing.T) {
 	// setup
 	db := test.DB()
 	user, _ := Get(db, "mockUser")
 
 	// success
-	pair, err := user.SetPair("name", "body")
-	assert.Equal(t, "name", pair.Name)
+	size, err := user.Size()
+	assert.Equal(t, int64(2), size)
 	assert.NoError(t, err)
-
-	// confirm - database
-	name := test.Get(t, db, "select name from Pairs where id=3")
-	assert.Equal(t, "name", name)
 }

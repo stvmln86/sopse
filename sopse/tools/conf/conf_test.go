@@ -16,5 +16,5 @@ func TestParse(t *testing.T) {
 	assert.Equal(t, 24*7*time.Hour, conf.PairLife)
 	assert.Equal(t, 6*time.Hour, conf.TaskWait)
 	assert.Equal(t, 1000, conf.UserRate)
-	assert.Equal(t, 256, conf.UserSize)
+	assert.Equal(t, int64(256), conf.UserSize)
 }

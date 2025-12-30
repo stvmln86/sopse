@@ -14,7 +14,7 @@ type Conf struct {
 	PairLife time.Duration
 	TaskWait time.Duration
 	UserRate int
-	UserSize int
+	UserSize int64
 }
 
 // Parse returns a new Conf from parsed command-line arguments.
@@ -27,7 +27,7 @@ func Parse(elems []string) *Conf {
 	fset.DurationVar(&conf.PairLife, "pairLife", 24*7*time.Hour, "pair expiry time")
 	fset.DurationVar(&conf.TaskWait, "taskWait", 6*time.Hour, "background task wait")
 	fset.IntVar(&conf.UserRate, "userRate", 1000, "max requests per hour")
-	fset.IntVar(&conf.UserSize, "userSize", 256, "max pairs per user")
+	fset.Int64Var(&conf.UserSize, "userSize", 256, "max pairs per user")
 	fset.Parse(elems)
 	return conf
 }
