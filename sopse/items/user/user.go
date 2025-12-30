@@ -20,7 +20,7 @@ type User struct {
 }
 
 const (
-	deletePair = `
+	deleteUser = `
 		delete from Users where id=?
 	`
 
@@ -66,7 +66,7 @@ func Get(db *sqlx.DB, uuid string) (*User, error) {
 
 // Delete deletes the User.
 func (u *User) Delete() error {
-	_, err := u.DB.Exec(deletePair, u.ID)
+	_, err := u.DB.Exec(deleteUser, u.ID)
 	return err
 }
 
