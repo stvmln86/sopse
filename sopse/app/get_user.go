@@ -21,15 +21,10 @@ func (a *App) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pairs, err := user.ListPairs()
+	names, err := user.ListPairs()
 	if err != nil {
 		prot.WriteError(w, http.StatusInternalServerError)
 		return
-	}
-
-	var names = make([]string, 0, len(pairs))
-	for _, pair := range pairs {
-		names = append(names, pair.Name())
 	}
 
 	prot.Write(w, http.StatusOK, strings.Join(names, "\n"))
