@@ -1,8 +1,7 @@
 # Project Notes 
 
 ## 2025-12-30
-- [x] Rename `mockUser1` to just `mockUser`.
-- [x] Add capacity hints to all sequence variables.
+- [ ] Complete SQLite rewrite.
+- [ ] Add all handlers (create user, set pair, get user/pair, delete user/pair).
 - [ ] Add background routine to clean out expired Pairs and rate limits.
   - [ ] Add a `-taskWait` flag for background task sleep durations.
-- [ ] Add remaining handlers (get pair, delete pair, delete user).
